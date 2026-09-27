@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mockup Studio · TGI Sport</title>
+  <link rel="icon" type="image/png" href="app/favicon.png">
+  <link rel="apple-touch-icon" href="app/favicon-180.png">
+  <link rel="stylesheet" href="app/stile.css">
+</head>
+<body>
+  <header class="testata">
+    <div class="marchio">
+      <img class="marchio-logo" src="Logo/TGI-Sport_black.png" alt="TGI Sport" onerror="this.remove()">
+      <span class="marchio-nome">Mockup Studio</span>
+    </div>
+    <nav class="schede" role="tablist" aria-label="Sezioni">
+      <button type="button" role="tab" data-vista="mockup" aria-selected="true">Crea mockup</button>
+      <button type="button" role="tab" data-vista="template" aria-selected="false">Template</button>
+    </nav>
+    <span class="spazio"></span>
+    <button type="button" class="esci" id="btn-esci" hidden>Esci</button>
+  </header>
+
+  <!-- Accesso con la password del team (i template sono cifrati) -->
+  <div class="accesso" id="accesso" hidden>
+    <form class="accesso-scheda" id="accesso-form" autocomplete="on">
+      <img class="accesso-logo" src="Logo/TGI-Sport_black.png" alt="TGI Sport" onerror="this.remove()">
+      <h1>Mockup Studio</h1>
+      <p>Inserisci la password del team per entrare.</p>
+      <label class="campo"><span>Password</span><input type="password" id="accesso-password" autocomplete="current-password" required></label>
+      <label class="spunta"><input type="checkbox" id="accesso-ricorda" checked><span>Ricorda su questo computer</span></label>
+      <div class="errore" id="accesso-errore" role="alert" hidden></div>
+      <button type="submit" class="primario" id="accesso-entra">Entra</button>
+    </form>
+  </div>
+
+  <main>
+    <!-- ===================== CREA MOCKUP ===================== -->
+    <section class="vista" id="vista-mockup">
+      <aside class="pannello">
+        <section class="passo">
+          <h2><span class="n">1</span>Cliente e tipologia</h2>
+          <label class="campo"><span>Cliente</span><select id="sel-cliente"></select></label>
+          <div class="segmentato" id="sel-tipo" role="radiogroup" aria-label="Tipologia">
+            <button type="button" role="radio" data-tipo="CC"><b>Centro campo</b><small>cerchio 500 px</small></button>
+            <button type="button" role="radio" data-tipo="MATS"><b>Tappeti</b><small>900 × 100 px</small></button>
+          </div>
+          <label class="campo" id="campo-scena" hidden><span>Immagine</span><select id="sel-scena"></select></label>
+        </section>
+
+        <section class="passo">
+          <h2><span class="n">2</span>Logo</h2>
+          <label class="drop" id="drop">
+            <input type="file" id="file-logo" accept=".ai,.pdf,.svg,.png,.jpg,.jpeg,.webp,image/*,application/pdf">
+            <svg class="drop-icona" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            <span class="drop-testo"><b>Trascina qui il logo</b><br>oppure clicca per sceglierlo</span>
+            <span class="drop-formati">.ai · .pdf · .svg · .png · .jpg</span>
+          </label>
+          <div class="file" id="file-info" hidden>
+            <div class="file-riga">
+              <span class="file-nome" id="file-nome"></span>
+              <button type="button" class="icona" id="btn-cambia-logo" title="Cambia logo" aria-label="Cambia logo">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+            <div class="file-meta" id="file-meta"></div>
+            <label class="campo" id="campo-pagina" hidden><span>Tavola</span><select id="sel-pagina"></select></label>
+            <div class="rilevato" id="rilevato"></div>
+            <label class="spunta"><input type="checkbox" id="chk-composto"><span>Usa il file così com'è <small>(già composto)</small></span></label>
+          </div>
+          <div class="errore" id="errore-logo" role="alert" hidden></div>
+        </section>
+
+        <section class="passo" id="passo-composizione">
+          <h2><span class="n">3</span>Composizione</h2>
+          <div class="campo">
+            <span>Colore di sfondo</span>
+            <div class="campioni" id="campioni"></div>
+            <div class="colore">
+              <input type="color" id="col-sfondo" value="#ffffff" aria-label="Scegli colore">
+              <input type="text" id="hex-sfondo" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Codice colore">
+            </div>
+          </div>
+          <label class="campo cursore"><span>Dimensione logo <output id="out-dim"></output></span><input type="range" id="rng-dim" min="10" max="120" step="1"></label>
+          <label class="campo cursore"><span>Spostamento orizzontale <output id="out-x"></output></span><input type="range" id="rng-x" min="-40" max="40" step="0.5"></label>
+          <label class="campo cursore"><span>Spostamento verticale <output id="out-y"></output></span><input type="range" id="rng-y" min="-40" max="40" step="0.5"></label>
+          <button type="button" class="link" id="btn-ricentra">Ricentra e ripristina dimensione</button>
+          <div id="blocco-sfondo-logo" hidden>
+            <label class="campo"><span>Sfondo pieno nel file del logo</span>
+              <select id="sel-rimuovi">
+                <option value="ovunque">Rimuovilo (tutto quel colore)</option>
+                <option value="contorno">Rimuovilo solo attorno al logo</option>
+                <option value="no">Mantienilo</option>
+              </select>
+            </label>
+            <label class="campo cursore" id="campo-tolleranza"><span>Tolleranza <output id="out-tol"></output></span><input type="range" id="rng-tol" min="5" max="120" step="1"></label>
+          </div>
+        </section>
+
+        <section class="passo" id="passo-posizioni">
+          <h2><span class="n">4</span>Posizioni</h2>
+          <div class="posizioni" id="lista-posizioni"></div>
+        </section>
+
+        <section class="passo">
+          <h2><span class="n">5</span>Salva</h2>
+          <label class="campo"><span>Nome brand</span><input type="text" id="txt-brand" placeholder="es. Nike" autocomplete="off" spellcheck="false"></label>
+          <ul class="uscite" id="uscite"></ul>
+          <div class="cartella" id="cartella"></div>
+          <button type="button" class="primario" id="btn-salva">Salva PNG + JPG</button>
+          <div class="secondari">
+            <button type="button" id="btn-png">Solo PNG</button>
+            <button type="button" id="btn-jpg">Solo JPG</button>
+          </div>
+        </section>
+      </aside>
+
+      <div class="area">
+        <div class="barra">
+          <div class="segmentato piccolo" id="sel-zoom" role="radiogroup" aria-label="Inquadratura">
+            <button type="button" role="radio" data-zoom="intera">Intera</button>
+            <button type="button" role="radio" data-zoom="dettaglio">Dettaglio</button>
+          </div>
+          <button type="button" class="tieni" id="btn-originale" title="Tieni premuto per vedere l'immagine senza il logo">Tieni premuto: originale</button>
+          <span class="spazio"></span>
+          <span class="misura" id="misura-mockup"></span>
+        </div>
+        <div class="palco" id="palco">
+          <div class="tela" id="tela">
+            <canvas id="cv-base"></canvas>
+            <canvas id="cv-mockup"></canvas>
+            <canvas id="cv-sovrapposto"></canvas>
+          </div>
+          <div class="palco-messaggio" id="palco-messaggio" hidden></div>
+          <div class="caricamento" id="caricamento" hidden><span></span></div>
+        </div>
+        <div class="produzione">
+          <div class="produzione-info">
+            <b>PNG di produzione</b>
+            <span id="misura-png"></span>
+          </div>
+          <div class="scacchiera" id="box-artwork"><canvas id="cv-artwork"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== TEMPLATE ===================== -->
+    <section class="vista" id="vista-template" hidden>
+      <aside class="pannello">
+        <section class="passo">
+          <h2>Template cliente</h2>
+          <label class="campo"><span>Template</span><select id="ed-sel-template"></select></label>
+          <div class="secondari">
+            <button type="button" id="ed-nuovo">+ Nuovo</button>
+            <label class="bottone">Importa file…<input type="file" id="ed-importa" accept=".js,.json" hidden></label>
+          </div>
+          <label class="campo"><span>Nome del cliente</span><input type="text" id="ed-nome" autocomplete="off"></label>
+          <p class="nota">File: <code id="ed-file"></code></p>
+        </section>
+
+        <section class="passo">
+          <h2>Immagini</h2>
+          <div class="lista" id="ed-scene"></div>
+          <label class="bottone pieno">+ Aggiungi immagine<input type="file" id="ed-file-scena" accept="image/jpeg,image/png,image/webp" hidden></label>
+        </section>
+
+        <section class="passo" id="ed-passo-scena" hidden>
+          <h2>Immagine selezionata</h2>
+          <label class="campo"><span>Nome</span><input type="text" id="ed-nome-scena" autocomplete="off"></label>
+          <div class="segmentato" id="ed-tipo-scena" role="radiogroup" aria-label="Tipologia dell'immagine">
+            <button type="button" role="radio" data-tipo="CC"><b>Centro campo</b><small>CC</small></button>
+            <button type="button" role="radio" data-tipo="MATS"><b>Tappeti</b><small>MATS</small></button>
+          </div>
+          <h3>Posizioni</h3>
+          <div class="lista" id="ed-posizioni"></div>
+          <button type="button" class="bottone pieno" id="ed-aggiungi-pos">+ Aggiungi posizione</button>
+          <div class="punto" id="ed-punto" hidden>
+            <span id="ed-punto-nome"></span>
+            <label>X <input type="number" id="ed-punto-x" step="0.1"></label>
+            <label>Y <input type="number" id="ed-punto-y" step="0.1"></label>
+          </div>
+          <label class="spunta"><input type="checkbox" id="ed-prova" checked><span>Mostra artwork di prova</span></label>
+          <p class="nota" id="ed-aiuto"></p>
+        </section>
+
+        <section class="passo">
+          <h2>Salva template</h2>
+          <p class="nota" id="ed-nota-salva"></p>
+          <button type="button" class="primario" id="ed-salva">Salva nella cartella templates</button>
+          <div class="secondari"><button type="button" id="ed-scarica">Scarica i file</button></div>
+        </section>
+
+        <section class="passo">
+          <h2>Password del team</h2>
+          <p class="nota" id="ed-nota-password"></p>
+          <form id="ed-form-password">
+            <label class="campo"><span>Nuova password</span><input type="password" id="ed-nuova-password" autocomplete="new-password" minlength="8"></label>
+            <label class="campo"><span>Ripeti la nuova password</span><input type="password" id="ed-conferma-password" autocomplete="new-password" minlength="8"></label>
+            <button type="submit" class="bottone pieno" id="ed-cambia-password">Imposta la nuova password</button>
+          </form>
+        </section>
+      </aside>
+
+      <div class="area">
+        <div class="barra">
+          <button type="button" class="piccolo" id="ed-adatta">Adatta</button>
+          <button type="button" class="piccolo" id="ed-100">100%</button>
+          <span class="misura" id="ed-zoom"></span>
+          <span class="spazio"></span>
+          <span class="suggerimento">Rotella: zoom · Trascina lo sfondo: sposta · Frecce: muovi il punto (⇧ ×10, ⌥ ×0,1)</span>
+        </div>
+        <div class="palco editor" id="ed-palco" tabindex="0">
+          <canvas id="ed-canvas"></canvas>
+          <canvas class="lente" id="ed-lente" width="176" height="176" hidden></canvas>
+          <div class="palco-messaggio" id="ed-messaggio">Scegli un template o aggiungi un'immagine per iniziare.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="avvisi" id="avvisi" aria-live="polite"></div>
+
+  <script src="app/geometria.js"></script>
+  <script src="app/rendering.js"></script>
+  <script src="app/loghi.js"></script>
+  <script src="app/composizione.js"></script>
+  <script src="app/cifratura.js"></script>
+  <script src="app/template.js"></script>
+  <script src="app/archivio.js"></script>
+  <script src="app/accesso.js"></script>
+  <script src="app/app.js"></script>
+  <script src="app/editor.js"></script>
+</body>
+</html>

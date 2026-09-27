@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200">
+  <path d="M40 150 C 70 60, 150 40, 190 60 C 150 70, 110 100, 95 150 Z" fill="#12a36b"/>
+  <path d="M95 150 C 120 105, 170 85, 215 95 C 175 110, 140 130, 130 160 Z" fill="#0b6e48"/>
+  <text x="235" y="138" font-family="Avenir Next, Avenir, Helvetica Neue, Arial, sans-serif" font-weight="700" font-size="96" fill="#0d2a3a" letter-spacing="2">brezzo</text>
+</svg>

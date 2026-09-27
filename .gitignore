@@ -1,0 +1,15 @@
+# Il repository è pubblico: si pubblicano SOLO i file della piattaforma.
+# Tutto il resto nella cartella (foto originali dei clienti, export, file della password…) resta sul computer.
+/*
+!/.gitignore
+!/.nojekyll
+!/index.html
+!/Mockup Studio.html
+!/README.md
+!/app/
+!/templates/
+!/Logo/
+!/loghi-di-prova/
+
+# File di sistema macOS
+**/.DS_Store
