@@ -76,6 +76,7 @@ main { flex: 1; min-height: 0; display: flex; }
   width: 100%; max-width: 380px; padding: 32px 30px 28px; border-radius: 16px; background: var(--pannello);
   box-shadow: 0 1px 2px rgba(16, 20, 30, .06), 0 20px 60px rgba(16, 20, 30, .12); position: relative; overflow: hidden;
 }
+.accesso.in-attesa .accesso-scheda { visibility: hidden; }
 .accesso-scheda::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--marchio-gradiente); }
 .accesso-logo { display: block; height: 52px; width: auto; margin: 0 0 22px; }
 .accesso-scheda h1 { margin: 0 0 6px; font-size: 20px; letter-spacing: -.015em; }

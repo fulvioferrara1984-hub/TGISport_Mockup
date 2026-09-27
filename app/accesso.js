@@ -21,6 +21,7 @@
       const box = $('accesso'), form = $('accesso-form'), campo = $('accesso-password');
       const errore = $('accesso-errore'), bottone = $('accesso-entra');
       box.hidden = false;
+      box.classList.remove('in-attesa');
       requestAnimationFrame(() => campo.focus());
       const invio = async (e) => {
         e.preventDefault();
@@ -55,15 +56,19 @@
 
   // Si risolve quando si può usare la piattaforma (subito se non è protetta o se il browser ricorda la password).
   async function sblocca() {
+    const box = $('accesso');
     const protezione = MK.template.protezione();
-    if (!protezione) return;
+    if (!protezione) { box.hidden = true; return; }
     $('btn-esci').hidden = false;
     if (!MK.cifra.disponibile()) {
-      $('accesso').hidden = false;
+      box.classList.remove('in-attesa');
       $('accesso-form').innerHTML = '<p class="errore">Questo browser non permette di aprire i template protetti. Usa Google Chrome aggiornato.</p>';
       return new Promise(() => {});
     }
-    const chiave = (await chiaveRicordata(protezione)) || (await chiediPassword(protezione));
+    let chiave = null;
+    try { chiave = await chiaveRicordata(protezione); } catch (e) { chiave = null; }
+    if (chiave) box.hidden = true;
+    else chiave = await chiediPassword(protezione);
     await MK.template.impostaChiave(chiave);
   }
 
