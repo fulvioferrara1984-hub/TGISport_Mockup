@@ -65,6 +65,7 @@
               </button>
             </div>
             <div class="file-meta" id="file-meta"></div>
+            <div class="file-miniatura sfondo-scacchi"><img id="file-miniatura" alt="Anteprima del file originale"></div>
             <label class="campo" id="campo-pagina" hidden><span>Tavola</span><select id="sel-pagina"></select></label>
             <div class="rilevato" id="rilevato"></div>
             <label class="spunta"><input type="checkbox" id="chk-composto"><span>Usa il file così com'è <small>(già composto)</small></span></label>
@@ -87,13 +88,24 @@
           <label class="campo cursore"><span>Spostamento verticale <output id="out-y"></output></span><input type="range" id="rng-y" min="-40" max="40" step="0.5"></label>
           <button type="button" class="link" id="btn-ricentra">Ricentra e ripristina dimensione</button>
           <div id="blocco-sfondo-logo" hidden>
-            <label class="campo"><span>Sfondo pieno nel file del logo</span>
+            <label class="campo"><span>Sfondo del file del logo</span>
               <select id="sel-rimuovi">
-                <option value="ovunque">Rimuovilo (tutto quel colore)</option>
-                <option value="contorno">Rimuovilo solo attorno al logo</option>
-                <option value="no">Mantienilo</option>
+                <option value="no">Mantienilo com'è</option>
+                <option value="ovunque">Togli un colore (ovunque)</option>
+                <option value="contorno">Togli un colore solo attorno al logo</option>
               </select>
             </label>
+            <p class="nota" id="nota-sfondo"></p>
+            <div class="campo" id="campo-colore-rimozione">
+              <span>Colore da togliere</span>
+              <div class="colore">
+                <input type="color" id="col-rimozione" value="#ffffff" aria-label="Colore da togliere">
+                <input type="text" id="hex-rimozione" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Codice del colore da togliere">
+                <button type="button" class="contagocce" id="btn-contagocce" title="Preleva il colore dallo schermo, per esempio dall'anteprima del file" aria-label="Preleva il colore dallo schermo" hidden>
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"/></svg>
+                </button>
+              </div>
+            </div>
             <label class="campo cursore" id="campo-tolleranza"><span>Tolleranza <output id="out-tol"></output></span><input type="range" id="rng-tol" min="5" max="120" step="1"></label>
           </div>
         </section>

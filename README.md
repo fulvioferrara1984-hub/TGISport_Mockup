@@ -19,8 +19,9 @@ Consigliato **Google Chrome** (o Edge): permette di salvare direttamente in una 
 2. **Logo**: trascina il file del cliente (`.ai`, `.pdf`, `.svg`, `.png`, `.jpg`) nel riquadro, oppure incollalo con ⌘V.
    - Se il file è **già composto** (PNG 500×500 con il cerchio e gli angoli trasparenti, oppure 900×100 pieno), viene riconosciuto e usato così com'è: il PNG di produzione è il file originale, identico.
    - Altrimenti il logo viene **composto** automaticamente: inscritto nel cerchio da 500 px (CC) o centrato nel rettangolo 900×100 (MATS).
-   - Se il logo arriva su fondo bianco (es. JPG), lo sfondo viene tolto; si può scegliere di mantenerlo.
+   - Sotto il nome del file compare l'anteprima del file originale, su scacchiera: così si vede subito se ha uno sfondo.
 3. **Composizione**: colore di sfondo (ci sono i colori presi dal logo, bianco e nero, o un colore qualsiasi), dimensione e posizione del logo.
+   - **Sfondo del file del logo**: toglie un colore dal file, *ovunque* oppure *solo attorno al logo* (utile se dentro al logo ci sono parti dello stesso colore da tenere). Il colore si sceglie con il selettore, scrivendo il codice o con il contagocce (Chrome), anche prelevandolo dall'anteprima del file. I fondi bianchi vengono tolti in automatico; con *Tolleranza* si regola quanto togliere.
 4. **Posizioni**: per i tappeti scegli dove inserire il logo. Passando il mouse su una posizione, si evidenzia nell'anteprima.
 5. **Salva**: scrivi il nome del brand e premi *Salva PNG + JPG*. Si ottengono:
    - `Brand_CC.png` / `Brand_MATS.png` → file per la produzione

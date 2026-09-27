@@ -276,8 +276,8 @@
     return { colori: scelti.map(inHex), luminanza: peso ? somma / peso : 128 };
   }
 
-  // Sfondo pieno e uniforme (es. JPG su bianco)? Restituisce il colore oppure null. Legge solo i bordi.
-  function sfondoUniforme(canvas) {
+  // Pixel dei quattro bordi dell'immagine (campionati), come [r, g, b, a].
+  function campioniBordo(canvas) {
     const w = canvas.width, h = canvas.height;
     const ctx = R.contesto(canvas);
     const bordi = [ctx.getImageData(0, 0, w, 1).data, ctx.getImageData(0, h - 1, w, 1).data,
@@ -287,10 +287,31 @@
     for (const D of bordi) {
       for (let i = 0; i < D.length / 4; i += passo) campioni.push([D[i * 4], D[i * 4 + 1], D[i * 4 + 2], D[i * 4 + 3]]);
     }
+    return campioni;
+  }
+
+  // Sfondo pieno e uniforme (es. JPG su bianco)? Restituisce il colore oppure null.
+  function sfondoUniforme(canvas) {
+    const campioni = campioniBordo(canvas);
     if (campioni.some((c) => c[3] < 250)) return null;
     const med = [0, 1, 2].map((i) => campioni.map((c) => c[i]).sort((a, b) => a - b)[campioni.length >> 1]);
     const vicini = campioni.filter((c) => Math.max(Math.abs(c[0] - med[0]), Math.abs(c[1] - med[1]), Math.abs(c[2] - med[2])) < 30).length;
     return vicini / campioni.length > 0.9 ? med : null;
+  }
+
+  // Colore pieno più frequente sul bordo: è la proposta per "colore da togliere" (null se il bordo è trasparente).
+  function coloreBordo(canvas) {
+    const gruppi = new Map();
+    for (const c of campioniBordo(canvas)) {
+      if (c[3] < 250) continue;
+      const k = ((c[0] >> 4) << 8) | ((c[1] >> 4) << 4) | (c[2] >> 4);
+      const g = gruppi.get(k) || { n: 0, r: 0, g: 0, b: 0 };
+      g.n++; g.r += c[0]; g.g += c[1]; g.b += c[2];
+      gruppi.set(k, g);
+    }
+    let meglio = null;
+    for (const g of gruppi.values()) if (!meglio || g.n > meglio.n) meglio = g;
+    return meglio ? [meglio.r / meglio.n, meglio.g / meglio.n, meglio.b / meglio.n].map(Math.round) : null;
   }
 
   // Fondo bianco o quasi (il caso tipico da togliere, a differenza dei loghi dentro un riquadro colorato).
@@ -313,7 +334,7 @@
       ammessi = new Uint8Array(w * h);
       const coda = new Int32Array(w * h);
       let testa = 0, fine = 0;
-      const prova = (i) => { if (!ammessi[i] && dist(i * 4) < hi) { ammessi[i] = 1; coda[fine++] = i; } };
+      const prova = (i) => { if (!ammessi[i] && (D[i * 4 + 3] < 16 || dist(i * 4) < hi)) { ammessi[i] = 1; coda[fine++] = i; } };
       for (let x = 0; x < w; x++) { prova(x); prova((h - 1) * w + x); }
       for (let y = 0; y < h; y++) { prova(y * w); prova(y * w + w - 1); }
       while (testa < fine) {
@@ -326,7 +347,9 @@
     }
     for (let i = 0, n = w * h; i < n; i++) {
       if (ammessi && !ammessi[i]) continue;
-      const o = i * 4, d = dist(o);
+      const o = i * 4;
+      if (D[o + 3] === 0) continue;
+      const d = dist(o);
       if (d >= hi) continue;
       const f = d <= lo ? 0 : (d - lo) / (hi - lo);
       if (f > 0) {
@@ -374,7 +397,7 @@
   }
 
   MK.loghi = {
-    carica, cambiaPagina, rifila, riquadroVisibile, rilevaComposto, analizzaColori, sfondoUniforme, quasiBianco,
+    carica, cambiaPagina, rifila, riquadroVisibile, rilevaComposto, analizzaColori, sfondoUniforme, coloreBordo, quasiBianco,
     rimuoviSfondo, raggioVisibile, inHex, daHex, estensione, leggiComeDataURL, caricaImmagine,
   };
 })(window.MK = window.MK || {});

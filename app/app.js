@@ -3,7 +3,7 @@
   'use strict';
 
   const $ = (id) => document.getElementById(id);
-  const L = MK.loghi, C = MK.composizione, A = MK.archivio;
+  const L = MK.loghi, C = MK.composizione, A = MK.archivio, R = MK.render;
 
   const stato = {
     template: null,
@@ -21,7 +21,8 @@
     composto: false,
     p: { sfondo: '#ffffff', dimensione: MK.TIPI.CC.dimensione, offX: 0, offY: 0 },
     coloreScelto: false,
-    rimuovi: 'ovunque',
+    rimuovi: 'no',
+    coloreRimozione: '#ffffff',
     tolleranza: 40,
     attive: {},            // id scena -> Set(id posizioni)
     brand: '',
@@ -227,12 +228,14 @@
     const grezzo = s.canvas;
     if (nuovo) {
       stato.uniforme = L.sfondoUniforme(grezzo);
+      stato.coloreRimozione = L.inHex(stato.uniforme || L.coloreBordo(grezzo) || [255, 255, 255]);
       // si toglie da solo solo il fondo bianco: un riquadro colorato di solito fa parte del logo
       stato.rimuovi = L.quasiBianco(stato.uniforme) ? 'ovunque' : 'no';
       stato.rifilatoGrezzo = L.rifila(grezzo);
+      aggiornaMiniatura();
     }
-    const lavoro = stato.uniforme && stato.rimuovi !== 'no'
-      ? L.rimuoviSfondo(grezzo, stato.uniforme, stato.rimuovi, stato.tolleranza)
+    const lavoro = stato.rimuovi !== 'no'
+      ? L.rimuoviSfondo(grezzo, L.daHex(stato.coloreRimozione), stato.rimuovi, stato.tolleranza)
       : grezzo;
     const canvas = L.rifila(lavoro);
     stato.logo = { canvas, raggio: L.raggioVisibile(canvas) };
@@ -307,8 +310,18 @@
     aggiornaControlli();
   }
 
+  // Anteprima del file così com'è arrivato: utile per vedere lo sfondo e prelevarne il colore.
+  function aggiornaMiniatura() {
+    const img = $('file-miniatura');
+    const c = stato.sorgente && stato.sorgente.canvas;
+    if (!c) { img.removeAttribute('src'); return; }
+    const k = Math.min(1, 560 / c.width, 180 / c.height);
+    img.src = (k < 1 ? R.ridimensiona(c, c.width * k, c.height * k) : c).toDataURL('image/png');
+  }
+
   function togliLogo() {
-    Object.assign(stato, { sorgente: null, logo: null, rifilatoGrezzo: null, uniforme: null, rilevato: false, fonteComposto: null, passthrough: false, composto: false, colori: [], coloreScelto: false });
+    Object.assign(stato, { sorgente: null, logo: null, rifilatoGrezzo: null, uniforme: null, rilevato: false, fonteComposto: null, passthrough: false, composto: false, colori: [], coloreScelto: false, rimuovi: 'no' });
+    aggiornaMiniatura();
     $('errore-logo').hidden = true;
     aggiornaInfoLogo();
     aggiornaUscite();
@@ -329,8 +342,17 @@
     $('rng-tol').value = stato.tolleranza;
     $('out-tol').textContent = stato.tolleranza;
     $('sel-rimuovi').value = stato.rimuovi;
-    $('blocco-sfondo-logo').hidden = !(stato.sorgente && stato.uniforme && !stato.composto);
-    $('campo-tolleranza').hidden = stato.rimuovi === 'no';
+    $('blocco-sfondo-logo').hidden = !(stato.sorgente && !stato.composto);
+    const togli = stato.rimuovi !== 'no';
+    $('campo-colore-rimozione').hidden = !togli;
+    $('campo-tolleranza').hidden = !togli;
+    $('col-rimozione').value = stato.coloreRimozione;
+    if (document.activeElement !== $('hex-rimozione')) $('hex-rimozione').value = stato.coloreRimozione.toUpperCase();
+    $('btn-contagocce').hidden = !('EyeDropper' in window);
+    $('nota-sfondo').textContent = !stato.sorgente ? ''
+      : L.quasiBianco(stato.uniforme) ? 'Il file ha lo sfondo bianco: viene tolto in automatico.'
+      : stato.uniforme ? 'Il file ha uno sfondo pieno colorato: se non fa parte del logo, scegli di toglierlo.'
+      : togli ? '' : 'Se il logo ha un riquadro o uno sfondo da eliminare, scegli di togliere il suo colore.';
     $('passo-composizione').classList.toggle('disattivo', !!(stato.sorgente && stato.composto));
     riempiCampioni();
   }
@@ -642,12 +664,37 @@
       richiediRender();
     });
     $('sel-rimuovi').addEventListener('change', (e) => { stato.rimuovi = e.target.value; elaboraLogo(false); richiediRender(); });
-    let timerTol = 0;
+    let timerSfondo = 0;
+    const rielaboraPresto = () => {
+      clearTimeout(timerSfondo);
+      timerSfondo = setTimeout(() => { elaboraLogo(false); richiediRender(); }, 120);
+    };
     $('rng-tol').addEventListener('input', (e) => {
       stato.tolleranza = Number(e.target.value);
       $('out-tol').textContent = stato.tolleranza;
-      clearTimeout(timerTol);
-      timerTol = setTimeout(() => { elaboraLogo(false); richiediRender(); }, 120);
+      rielaboraPresto();
+    });
+    // scegliere un colore da togliere attiva la rimozione
+    const coloreDaTogliere = (hex) => {
+      const rgb = L.daHex(hex);
+      if (!rgb || !stato.sorgente) return;
+      stato.coloreRimozione = L.inHex(rgb);
+      if (stato.rimuovi === 'no') stato.rimuovi = 'ovunque';
+      aggiornaControlli();
+      rielaboraPresto();
+    };
+    $('col-rimozione').addEventListener('input', (e) => coloreDaTogliere(e.target.value));
+    $('hex-rimozione').addEventListener('input', (e) => {
+      let v = e.target.value.trim();
+      if (v && v[0] !== '#') v = '#' + v;
+      if (/^#[0-9a-f]{6}$/i.test(v)) coloreDaTogliere(v);
+    });
+    $('hex-rimozione').addEventListener('blur', () => aggiornaControlli());
+    $('btn-contagocce').addEventListener('click', async () => {
+      try {
+        const scelta = await new window.EyeDropper().open();
+        coloreDaTogliere(scelta.sRGBHex);
+      } catch (err) { /* prelievo annullato */ }
     });
 
     $('txt-brand').addEventListener('input', (e) => { stato.brand = e.target.value; stato.brandAutomatico = false; aggiornaUscite(); });
