@@ -72,7 +72,25 @@
   }
 
   // ---------- template e scene ----------
+  // Un pulsante per ogni tipologia definita in MK.TIPI (usato anche dall'editor dei template).
+  function riempiTipi(contenitore, dettaglio) {
+    contenitore.innerHTML = '';
+    for (const [chiave, t] of Object.entries(MK.TIPI)) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('role', 'radio');
+      b.dataset.tipo = chiave;
+      const nome = document.createElement('b');
+      nome.textContent = t.nome;
+      const sotto = document.createElement('small');
+      sotto.textContent = dettaglio(t);
+      b.append(nome, sotto);
+      contenitore.appendChild(b);
+    }
+  }
+
   async function avvia() {
+    riempiTipi($('sel-tipo'), C.descrizioneFormato);
     collegaEventi();
     segna('#sel-zoom', 'zoom', stato.zoom);
     aggiornaControlli();
@@ -111,7 +129,11 @@
       $('sel-cliente').value = id;
       ricorda('cliente', id);
       const tipi = [...new Set(t.scene.map((s) => s.tipo))];
-      document.querySelectorAll('#sel-tipo button').forEach((b) => { b.disabled = !tipi.includes(b.dataset.tipo); });
+      document.querySelectorAll('#sel-tipo button').forEach((b) => {
+        b.disabled = !tipi.includes(b.dataset.tipo);
+        b.title = b.disabled ? 'Nessuna immagine di questa tipologia per il cliente: aggiungila dalla scheda Template' : '';
+      });
+      $('nota-tipi').hidden = tipi.length >= Object.keys(MK.TIPI).length;
       if (!tipi.length) {
         messaggioPalco('Questo template non contiene immagini.');
         return;
@@ -608,7 +630,10 @@
     $('btn-esci').addEventListener('click', () => MK.accesso.esci());
 
     $('sel-cliente').addEventListener('change', (e) => selezionaCliente(e.target.value));
-    document.querySelectorAll('#sel-tipo button').forEach((b) => b.addEventListener('click', () => selezionaTipo(b.dataset.tipo)));
+    $('sel-tipo').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-tipo]');
+      if (b && !b.disabled) selezionaTipo(b.dataset.tipo);
+    });
     $('sel-scena').addEventListener('change', (e) => selezionaScena(e.target.value));
 
     $('file-logo').addEventListener('change', (e) => { if (e.target.files[0]) caricaLogo(e.target.files[0]); });
@@ -747,6 +772,6 @@
     }
   }
 
-  MK.app = { stato, avvisa, esc, ricorda, ricordato, templateAggiornato, mostraVista, caricaLogo, salva, render, blobPNG, blobJPG };
+  MK.app = { riempiTipi, stato, avvisa, esc, ricorda, ricordato, templateAggiornato, mostraVista, caricaLogo, salva, render, blobPNG, blobJPG };
   document.addEventListener('DOMContentLoaded', avvia);
 })(window.MK = window.MK || {});

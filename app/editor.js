@@ -12,6 +12,7 @@
   const AIUTO = {
     CC: 'Porta i 4 punti sulla linea del cerchio di centrocampo: <b>alto</b> e <b>basso</b> dove la linea di metà campo incrocia il cerchio, <b>destra</b> e <b>sinistra</b> all\'altezza del dischetto. L\'ellisse deve combaciare con il cerchio e il mirino deve cadere sul dischetto: così anche la prospettiva del logo sarà corretta.',
     MATS: 'Porta i 4 angoli sulla faccia del tappeto dove andrà la grafica, nell\'ordine in cui si legge il logo: <b>alto sx, alto dx, basso dx, basso sx</b>. Usa la lente e le frecce della tastiera per la precisione.',
+    rettangolo: 'Porta i 4 angoli sull\'area dove andrà la grafica, nell\'ordine in cui si legge il logo: <b>alto sx, alto dx, basso dx, basso sx</b>. Usa la lente e le frecce della tastiera per la precisione.',
   };
 
   const ed = {
@@ -118,7 +119,7 @@
     if (s) {
       $('ed-nome-scena').value = s.nome;
       document.querySelectorAll('#ed-tipo-scena button').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.tipo === s.tipo)));
-      $('ed-aiuto').innerHTML = AIUTO[s.tipo];
+      $('ed-aiuto').innerHTML = AIUTO[s.tipo] || AIUTO[formato(s).forma === 'cerchio' ? 'CC' : 'rettangolo'];
       riempiPosizioni();
     }
     aggiornaPunto();
@@ -512,8 +513,8 @@
     try {
       const url = await MK.loghi.leggiComeDataURL(file);
       const img = await MK.loghi.caricaImmagine(url);
-      const tipi = ed.template.scene.map((s) => s.tipo);
-      const tipo = tipi.includes('CC') && !tipi.includes('MATS') ? 'MATS' : 'CC';
+      const usate = ed.template.scene.map((s) => s.tipo);
+      const tipo = Object.keys(MK.TIPI).find((k) => !usate.includes(k)) || 'CC';
       const nome = file.name.replace(/\.[a-z0-9]+$/i, '');
       const s = {
         id: idUnico(T.slug(nome), ed.template.scene.map((x) => x.id)),
@@ -548,7 +549,7 @@
       const alt = larg * 0.22;
       punti = [[c[0], c[1] - alt / 2], [c[0] + larg / 2, c[1]], [c[0], c[1] + alt / 2], [c[0] - larg / 2, c[1]]];
     } else {
-      const alt = larg / 6;
+      const alt = larg * (f.h / f.w);
       punti = [[c[0] - larg / 2, c[1] - alt / 2], [c[0] + larg / 2, c[1] - alt / 2], [c[0] + larg / 2, c[1] + alt / 2], [c[0] - larg / 2, c[1] + alt / 2]];
     }
     const n = s.posizioni.length + 1;
@@ -753,7 +754,11 @@
       const voce = document.querySelector('#ed-scene .voce.attiva b');
       if (voce) voce.textContent = s.nome;
     });
-    document.querySelectorAll('#ed-tipo-scena button').forEach((b) => b.addEventListener('click', () => cambiaTipo(b.dataset.tipo)));
+    MK.app.riempiTipi($('ed-tipo-scena'), C.descrizioneFormato);
+    $('ed-tipo-scena').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-tipo]');
+      if (b) cambiaTipo(b.dataset.tipo);
+    });
     $('ed-aggiungi-pos').addEventListener('click', aggiungiPosizione);
     $('ed-prova').addEventListener('change', () => ricomponi(false));
     for (const [id, i] of [['ed-punto-x', 0], ['ed-punto-y', 1]]) {

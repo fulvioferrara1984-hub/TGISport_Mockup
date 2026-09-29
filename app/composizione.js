@@ -4,11 +4,19 @@
 
   const R = MK.render;
 
-  // Formati di produzione. Ogni scena di un template può sovrascrivere w/h con `formato`.
+  // Tipologie di mockup e formati di produzione (la sigla finisce nel nome dei file: Brand_<sigla>.png/.jpg).
+  // Aggiungere una tipologia qui basta per averla in tutta la piattaforma; una scena può sovrascrivere w/h con `formato`.
   MK.TIPI = {
     CC: { sigla: 'CC', nome: 'Centro campo', forma: 'cerchio', w: 500, h: 500, dimensione: 0.8 },
     MATS: { sigla: 'MATS', nome: 'Tappeti', forma: 'rettangolo', w: 900, h: 100, dimensione: 0.7 },
+    ADDITIONAL: { sigla: 'Additional', nome: 'Additional', forma: 'rettangolo', w: 248, h: 100, dimensione: 0.7 },
+    RETROPORTA_GROUND: { sigla: 'Retroporta_ground', nome: 'Retroporta ground', forma: 'rettangolo', w: 700, h: 200, dimensione: 0.7 },
+    RETROPORTA_VERTICAL: { sigla: 'Retroporta_vertical', nome: 'Retroporta vertical', forma: 'rettangolo', w: 480, h: 181, dimensione: 0.7 },
   };
+
+  function descrizioneFormato(t) {
+    return t.forma === 'cerchio' ? 'cerchio ' + t.w + ' px' : t.w + ' × ' + t.h + ' px';
+  }
 
   function formatoScena(scena) {
     const base = MK.TIPI[scena.tipo];
@@ -83,9 +91,16 @@
       g.addColorStop(0, '#e8364f'); g.addColorStop(1, '#2c5bd8');
       x.fillStyle = g; x.fillRect(0, 0, W, H);
       x.fillStyle = '#fff';
-      x.font = 'bold ' + Math.round(H * 0.5) + 'px system-ui, sans-serif';
+      const testo = 'PROVA ' + formato.w + '×' + formato.h;
+      let corpo = Math.round(H * 0.5);
+      x.font = 'bold ' + corpo + 'px system-ui, sans-serif';
+      const largo = x.measureText(testo).width;
+      if (largo > W * 0.86) {
+        corpo = Math.floor((corpo * W * 0.86) / largo);
+        x.font = 'bold ' + corpo + 'px system-ui, sans-serif';
+      }
       x.textAlign = 'center'; x.textBaseline = 'middle';
-      x.fillText('PROVA ' + formato.w + '×' + formato.h, W / 2, H / 2);
+      x.fillText(testo, W / 2, H / 2);
       x.fillRect(0, 0, W * 0.02, H);
     }
     return c;
@@ -120,5 +135,5 @@
     ctx.closePath();
   }
 
-  MK.composizione = { formatoScena, componi, adattaComposto, artworkProva, mockup, mascheraCerchio, tracciaContorno };
+  MK.composizione = { descrizioneFormato, formatoScena, componi, adattaComposto, artworkProva, mockup, mascheraCerchio, tracciaContorno };
 })(window.MK = window.MK || {});

@@ -13,9 +13,21 @@ Consigliato **Google Chrome** (o Edge): permette di salvare direttamente in una 
 
 > I file `.ai` e `.pdf` vengono letti con una libreria (pdf.js) caricata da internet al momento: per quei formati serve la connessione.
 
+## Tipologie di mockup
+
+| Tipologia | Area nella foto | PNG di produzione | Nome dei file |
+|---|---|---|---|
+| Centro campo | cerchio (4 punti sul cerchio) | 500 × 500, cerchio | `Brand_CC` |
+| Tappeti | rettangolo (4 angoli) | 900 × 100 | `Brand_MATS` |
+| Additional | rettangolo (4 angoli) | 248 × 100 | `Brand_Additional` |
+| Retroporta ground | rettangolo (4 angoli) | 700 × 200 | `Brand_Retroporta_ground` |
+| Retroporta vertical | rettangolo (4 angoli) | 480 × 181 | `Brand_Retroporta_vertical` |
+
+Per ogni cliente compaiono le tipologie per cui il template ha almeno un'immagine; le altre sono in grigio e si aggiungono dalla scheda *Template*.
+
 ## Creare un mockup
 
-1. **Cliente e tipologia**: scegli il cliente e *Centro campo* (CC) o *Tappeti* (MATS).
+1. **Cliente e tipologia**: scegli il cliente e la tipologia (vedi tabella sopra).
 2. **Logo**: trascina il file del cliente (`.ai`, `.pdf`, `.svg`, `.png`, `.jpg`) nel riquadro, oppure incollalo con ⌘V.
    - Se il file è **già composto** (PNG 500×500 con il cerchio e gli angoli trasparenti, oppure 900×100 pieno), viene riconosciuto e usato così com'è: il PNG di produzione è il file originale, identico.
    - Altrimenti il logo viene **composto** automaticamente: inscritto nel cerchio da 500 px (CC) o centrato nel rettangolo 900×100 (MATS).
@@ -24,8 +36,8 @@ Consigliato **Google Chrome** (o Edge): permette di salvare direttamente in una 
    - **Sfondo del file del logo**: toglie un colore dal file, *ovunque* oppure *solo attorno al logo* (utile se dentro al logo ci sono parti dello stesso colore da tenere). Il colore si sceglie con il selettore, scrivendo il codice o con il contagocce (Chrome), anche prelevandolo dall'anteprima del file. I fondi bianchi vengono tolti in automatico; con *Tolleranza* si regola quanto togliere.
 4. **Posizioni**: per i tappeti scegli dove inserire il logo. Passando il mouse su una posizione, si evidenzia nell'anteprima.
 5. **Salva**: scrivi il nome del brand e premi *Salva PNG + JPG*. Si ottengono:
-   - `Brand_CC.png` / `Brand_MATS.png` → file per la produzione
-   - `Brand_CC.jpg` / `Brand_MATS.jpg` → mockup da inviare al cliente
+   - `Brand_<tipologia>.png` (es. `Brand_CC.png`, `Brand_Retroporta_ground.png`) → file per la produzione
+   - `Brand_<tipologia>.jpg` → mockup da inviare al cliente
 
 In anteprima: *Dettaglio* ingrandisce sulle posizioni, *Tieni premuto: originale* mostra la foto senza logo.
 
@@ -37,7 +49,7 @@ Nella scheda **Template**:
 
 1. *+ Nuovo* e scrivi il nome del cliente (per modificarne uno esistente, sceglilo dal menu).
 2. **Centro campo**: *+ Aggiungi immagine* → foto del centrocampo → tipologia *Centro campo* → *+ Aggiungi posizione*. Porta i 4 punti sulla linea del cerchio: *alto* e *basso* dove la linea di metà campo incrocia il cerchio, *destra* e *sinistra* all'altezza del dischetto. L'ellisse deve combaciare con il cerchio e il mirino cadere sul dischetto.
-3. **Tappeti**: *+ Aggiungi immagine* → foto dei tappeti → tipologia *Tappeti* → *+ Aggiungi posizione* per ogni tappeto. Porta i 4 angoli sulla faccia del tappeto, nell'ordine in cui si legge il logo (alto sx, alto dx, basso dx, basso sx).
+3. **Tappeti, Additional, Retroporta ground e vertical**: *+ Aggiungi immagine* → foto → scegli la tipologia → *+ Aggiungi posizione* per ogni area. Porta i 4 angoli sull'area dove andrà la grafica, nell'ordine in cui si legge il logo (alto sx, alto dx, basso dx, basso sx).
 4. **Dai un nome chiaro alle posizioni** (es. *Esterno sinistra*): è quello che si vede in *Crea mockup*.
 5. **Bordo (px)**: lascia 0 con foto pulite; metti 0,6–0,7 se nella foto c'è già un vecchio logo da coprire.
 6. **Controlla** con *Mostra artwork di prova*: il motivo deve coprire esattamente la zona e la scritta *ALTO* deve stare dalla parte lontana del campo.

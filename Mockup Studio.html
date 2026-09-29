@@ -42,10 +42,8 @@
         <section class="passo">
           <h2><span class="n">1</span>Cliente e tipologia</h2>
           <label class="campo"><span>Cliente</span><select id="sel-cliente"></select></label>
-          <div class="segmentato" id="sel-tipo" role="radiogroup" aria-label="Tipologia">
-            <button type="button" role="radio" data-tipo="CC"><b>Centro campo</b><small>cerchio 500 px</small></button>
-            <button type="button" role="radio" data-tipo="MATS"><b>Tappeti</b><small>900 × 100 px</small></button>
-          </div>
+          <div class="segmentato griglia" id="sel-tipo" role="radiogroup" aria-label="Tipologia"></div>
+          <p class="nota" id="nota-tipi" hidden>In grigio le tipologie senza un'immagine per questo cliente: si aggiungono dalla scheda Template.</p>
           <label class="campo" id="campo-scena" hidden><span>Immagine</span><select id="sel-scena"></select></label>
         </section>
 
@@ -180,10 +178,7 @@
         <section class="passo" id="ed-passo-scena" hidden>
           <h2>Immagine selezionata</h2>
           <label class="campo"><span>Nome</span><input type="text" id="ed-nome-scena" autocomplete="off"></label>
-          <div class="segmentato" id="ed-tipo-scena" role="radiogroup" aria-label="Tipologia dell'immagine">
-            <button type="button" role="radio" data-tipo="CC"><b>Centro campo</b><small>CC</small></button>
-            <button type="button" role="radio" data-tipo="MATS"><b>Tappeti</b><small>MATS</small></button>
-          </div>
+          <div class="segmentato griglia" id="ed-tipo-scena" role="radiogroup" aria-label="Tipologia dell'immagine"></div>
           <h3>Posizioni</h3>
           <div class="lista" id="ed-posizioni"></div>
           <button type="button" class="bottone pieno" id="ed-aggiungi-pos">+ Aggiungi posizione</button>
