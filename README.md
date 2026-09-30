@@ -46,7 +46,7 @@ In anteprima: *Dettaglio* ingrandisce sulle posizioni, *Tieni premuto: originale
 
 ## Aggiungere o modificare un cliente (template)
 
-**Prima di iniziare:** servono le foto di base del cliente, meglio in **JPG** 1920×1080 (in PNG il template pesa circa il triplo) e, se possibile, senza loghi già applicati. Lavora sulla copia della cartella del progetto sul tuo computer, con Chrome.
+**Prima di iniziare:** servono le foto di base del cliente, 1920×1080, **pulite** (senza loghi nelle aree da usare): così le posizioni non selezionate e i loghi su sfondo trasparente mostrano la superficie vera. Le foto in PNG vengono salvate in automatico come JPG di alta qualità, per tenere leggeri i template. Lavora sulla copia della cartella del progetto sul tuo computer, con Chrome.
 
 Nella scheda **Template**:
 
@@ -60,6 +60,16 @@ Nella scheda **Template**:
 7. *Salva nella cartella templates* e scegli la cartella `templates` del progetto (solo la prima volta). I file vengono salvati **già cifrati** con la password del team. Con Safari: *Scarica i file* e sposta i due file nella cartella `templates`, sostituendo `elenco.js`.
 8. Prova il nuovo cliente in *Crea mockup* con un logo di `loghi-di-prova`.
 9. **Pubblica** per i colleghi: in GitHub Desktop scrivi una descrizione generica (es. "Aggiornamento template": il repository è pubblico), *Commit to main*, poi *Push origin*. Il sito si aggiorna da solo in un paio di minuti.
+
+### Sostituire una foto (es. con quella pulita)
+
+1. Scheda **Template** → scegli il cliente → clicca l'immagine nell'elenco *Immagini*.
+2. **Sostituisci la foto (le posizioni restano)** → scegli la nuova foto. Posizioni e competizioni restano quelle di prima:
+   - stessa inquadratura e stessa misura: i punti combaciano già;
+   - stessa inquadratura ma risoluzione diversa (es. 3840×2160): i punti vengono riportati in scala da soli;
+   - proporzioni diverse: la piattaforma lo segnala e i punti vanno ricontrollati.
+3. Controlla con *Mostra artwork di prova* che le aree combacino. Con le foto pulite il **Bordo** delle posizioni può tornare a 0.
+4. Salva nella cartella `templates` e pubblica.
 
 Strumenti utili nell'editor: rotella per lo zoom, trascina lo sfondo per spostarti, frecce per muovere il punto selezionato (⇧ = 10 px, ⌥ = 0,1 px), lente d'ingrandimento durante lo spostamento.
 

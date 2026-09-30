@@ -575,12 +575,42 @@
     $('ed-nome').select();
   }
 
+  function mb(byte) {
+    return (byte / 1048576).toFixed(1).replace('.', ',') + ' MB';
+  }
+
+  function haTrasparenze(c) {
+    const D = MK.render.contesto(c).getImageData(0, 0, c.width, c.height).data;
+    for (let i = 3; i < D.length; i += 4) if (D[i] < 255) return true;
+    return false;
+  }
+
+  // Legge una foto di base. PNG e WebP senza trasparenze diventano JPG di alta qualità: i template
+  // restano leggeri (si scaricano ogni volta che un collega apre il cliente) e il mockup non cambia.
+  async function leggiFoto(file) {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error('Usa un\'immagine JPG o PNG come foto di base.');
+    let url = await MK.loghi.leggiComeDataURL(file);
+    let img = await MK.loghi.caricaImmagine(url);
+    let nota = '';
+    if (file.type !== 'image/jpeg') {
+      const c = MK.render.creaCanvas(img.naturalWidth, img.naturalHeight);
+      MK.render.contesto(c).drawImage(img, 0, 0);
+      if (!haTrasparenze(c)) {
+        const jpg = await A.canvasInBlob(c, 'image/jpeg', 0.93);
+        if (jpg.size < file.size) {
+          url = await MK.loghi.leggiComeDataURL(jpg);
+          img = await MK.loghi.caricaImmagine(url);
+          nota = ' Salvata come JPG di alta qualità (' + mb(file.size) + ' → ' + mb(jpg.size) + ').';
+        }
+      }
+    }
+    return { url, img, nota };
+  }
+
   async function aggiungiScena(file) {
     if (!ed.template) nuovoTemplate();
-    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return avvisa('Usa un\'immagine JPG o PNG come base.', 'errore');
     try {
-      const url = await MK.loghi.leggiComeDataURL(file);
-      const img = await MK.loghi.caricaImmagine(url);
+      const { url, img, nota } = await leggiFoto(file);
       const usate = ed.template.scene.map((s) => s.tipo);
       const tipo = Object.keys(MK.TIPI).find((k) => !usate.includes(k)) || 'CC';
       const nome = file.name.replace(/\.[a-z0-9]+$/i, '');
@@ -598,7 +628,39 @@
       ed.posId = null;
       segnaModifica();
       await caricaScena();
-      avvisa('Immagine aggiunta: scegli la tipologia e aggiungi le posizioni.', 'ok');
+      avvisa('Immagine aggiunta: scegli la tipologia e aggiungi le posizioni.' + nota, 'ok');
+    } catch (e) {
+      avvisa(e.message, 'errore');
+    }
+  }
+
+  // Sostituisce la foto dell'immagine selezionata (es. con quella pulita) mantenendo posizioni e competizioni.
+  async function sostituisciFoto(file) {
+    const s = scena();
+    if (!s) return;
+    try {
+      const { url, img, nota } = await leggiFoto(file);
+      const w = img.naturalWidth, h = img.naturalHeight;
+      const vw = s.larghezza || (ed.immagine && ed.immagine.naturalWidth) || w;
+      const vh = s.altezza || (ed.immagine && ed.immagine.naturalHeight) || h;
+      let avviso = '';
+      if (w !== vw || h !== vh) {
+        if (Math.abs(w / h - vw / vh) < 0.005) {
+          // stessa inquadratura a un'altra risoluzione: i punti vengono riportati in scala
+          const k = w / vw;
+          for (const p of s.posizioni) p.punti = p.punti.map(([x, y]) => [arrot(x * k), arrot(y * k)]);
+          avviso = ' Posizioni riportate alla nuova misura (' + w + '×' + h + ').';
+        } else {
+          if (!window.confirm('La nuova foto è ' + w + '×' + h + ', la precedente ' + vw + '×' + vh + ': le proporzioni sono diverse, quindi le posizioni andranno ricontrollate una per una.\nSostituire comunque?')) return;
+          avviso = ' Proporzioni diverse dalla foto precedente: ricontrolla le posizioni.';
+        }
+      }
+      s.immagine = url;
+      s.larghezza = w;
+      s.altezza = h;
+      segnaModifica();
+      await caricaScena();
+      avvisa('Foto sostituita: controlla che le posizioni combacino, poi salva.' + avviso + nota, avviso.includes('ricontrolla') ? 'errore' : 'ok');
     } catch (e) {
       avvisa(e.message, 'errore');
     }
@@ -814,6 +876,7 @@
       $('ed-file').textContent = nomeFile();
     });
     $('ed-file-scena').addEventListener('change', (e) => { if (e.target.files[0]) aggiungiScena(e.target.files[0]); e.target.value = ''; });
+    $('ed-file-sostituisci').addEventListener('change', (e) => { if (e.target.files[0]) sostituisciFoto(e.target.files[0]); e.target.value = ''; });
     $('ed-nome-scena').addEventListener('input', (e) => {
       const s = scena();
       if (!s) return;
