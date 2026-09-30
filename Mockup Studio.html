@@ -73,19 +73,7 @@
 
         <section class="passo" id="passo-composizione">
           <h2><span class="n">3</span>Composizione</h2>
-          <div class="campo">
-            <span>Colore di sfondo</span>
-            <div class="campioni" id="campioni"></div>
-            <div class="colore">
-              <input type="color" id="col-sfondo" value="#ffffff" aria-label="Scegli colore">
-              <input type="text" id="hex-sfondo" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Codice colore">
-            </div>
-          </div>
-          <label class="campo cursore"><span>Dimensione logo <output id="out-dim"></output></span><input type="range" id="rng-dim" min="10" max="120" step="1"></label>
-          <label class="campo cursore"><span>Spostamento orizzontale <output id="out-x"></output></span><input type="range" id="rng-x" min="-40" max="40" step="0.5"></label>
-          <label class="campo cursore"><span>Spostamento verticale <output id="out-y"></output></span><input type="range" id="rng-y" min="-40" max="40" step="0.5"></label>
-          <button type="button" class="link" id="btn-ricentra">Ricentra e ripristina dimensione</button>
-          <div id="blocco-sfondo-logo" hidden>
+          <div class="gruppo" id="blocco-sfondo-logo" hidden>
             <label class="campo"><span>Sfondo del file del logo</span>
               <select id="sel-rimuovi">
                 <option value="no">Mantienilo com'è</option>
@@ -106,11 +94,49 @@
             </div>
             <label class="campo cursore" id="campo-tolleranza"><span>Tolleranza <output id="out-tol"></output></span><input type="range" id="rng-tol" min="5" max="120" step="1"></label>
           </div>
+          <div class="gruppo" id="blocco-colore-logo" hidden>
+            <div class="campo">
+              <span>Colore del logo</span>
+              <div class="segmentato compatto" id="sel-colore-logo" role="radiogroup" aria-label="Colore del logo">
+                <button type="button" role="radio" data-colore-logo="originale"><b>Originale</b></button>
+                <button type="button" role="radio" data-colore-logo="tinta"><b>Cambia colore</b></button>
+              </div>
+            </div>
+            <div class="campo" id="campo-colore-logo" hidden>
+              <div class="campioni" id="campioni-logo"></div>
+              <div class="colore">
+                <input type="color" id="col-logo" value="#ffffff" aria-label="Nuovo colore del logo">
+                <input type="text" id="hex-logo" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Codice del nuovo colore del logo">
+              </div>
+            </div>
+            <p class="nota" id="nota-colore-logo"></p>
+          </div>
+          <div class="campo">
+            <span>Sfondo della grafica</span>
+            <div class="campioni" id="campioni"></div>
+            <div class="colore">
+              <input type="color" id="col-sfondo" value="#ffffff" aria-label="Scegli colore">
+              <input type="text" id="hex-sfondo" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Codice colore" placeholder="trasparente">
+            </div>
+            <p class="nota" id="nota-trasparente" hidden>Sfondo trasparente: nel mockup, attorno al logo si vede la foto. Serve una foto senza vecchi loghi in quella posizione.</p>
+          </div>
+          <label class="campo cursore"><span>Dimensione logo <output id="out-dim"></output></span><input type="range" id="rng-dim" min="10" max="120" step="1"></label>
+          <label class="campo cursore"><span>Spostamento orizzontale <output id="out-x"></output></span><input type="range" id="rng-x" min="-40" max="40" step="0.5"></label>
+          <label class="campo cursore"><span>Spostamento verticale <output id="out-y"></output></span><input type="range" id="rng-y" min="-40" max="40" step="0.5"></label>
+          <button type="button" class="link" id="btn-ricentra">Ricentra e ripristina dimensione</button>
         </section>
 
         <section class="passo" id="passo-posizioni">
           <h2><span class="n">4</span>Posizioni</h2>
-          <div class="posizioni" id="lista-posizioni"></div>
+          <div class="campo" id="blocco-competizione" hidden>
+            <span>Competizione</span>
+            <div class="segmentato griglia competizioni" id="sel-variante" role="radiogroup" aria-label="Competizione"></div>
+            <p class="nota">Sui tappeti fissi (es. gli interni) va la grafica della competizione scelta.</p>
+          </div>
+          <div class="campo" id="campo-posizioni">
+            <span id="etichetta-posizioni" hidden>Posizioni del logo</span>
+            <div class="posizioni" id="lista-posizioni"></div>
+          </div>
         </section>
 
         <section class="passo">
@@ -182,6 +208,10 @@
           <h3>Posizioni</h3>
           <div class="lista" id="ed-posizioni"></div>
           <button type="button" class="bottone pieno" id="ed-aggiungi-pos">+ Aggiungi posizione</button>
+          <h3>Competizioni</h3>
+          <p class="nota">Per le aree con una grafica che cambia con la competizione (es. tappeti interni: <i>Domestico</i> / <i>Internazionale</i>): aggiungi una grafica per competizione e segna quelle posizioni come <b>fisse</b>. Le posizioni fisse non ricevono il logo del brand.</p>
+          <div class="lista" id="ed-varianti"></div>
+          <label class="bottone pieno">+ Aggiungi competizione<input type="file" id="ed-file-variante" accept="image/png,image/jpeg,image/webp" hidden></label>
           <div class="punto" id="ed-punto" hidden>
             <span id="ed-punto-nome"></span>
             <label>X <input type="number" id="ed-punto-x" step="0.1"></label>

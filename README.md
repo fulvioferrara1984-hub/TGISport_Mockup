@@ -32,12 +32,15 @@ Per ogni cliente compaiono le tipologie per cui il template ha almeno un'immagin
    - Se il file è **già composto** (PNG 500×500 con il cerchio e gli angoli trasparenti, oppure 900×100 pieno), viene riconosciuto e usato così com'è: il PNG di produzione è il file originale, identico.
    - Altrimenti il logo viene **composto** automaticamente: inscritto nel cerchio da 500 px (CC) o centrato nel rettangolo 900×100 (MATS).
    - Sotto il nome del file compare l'anteprima del file originale, su scacchiera: così si vede subito se ha uno sfondo.
-3. **Composizione**: colore di sfondo (ci sono i colori presi dal logo, bianco e nero, o un colore qualsiasi), dimensione e posizione del logo.
+3. **Composizione**, nell'ordine:
    - **Sfondo del file del logo**: toglie un colore dal file, *ovunque* oppure *solo attorno al logo* (utile se dentro al logo ci sono parti dello stesso colore da tenere). Il colore si sceglie con il selettore, scrivendo il codice o con il contagocce (Chrome), anche prelevandolo dall'anteprima del file. I fondi bianchi vengono tolti in automatico; con *Tolleranza* si regola quanto togliere.
-4. **Posizioni**: per i tappeti scegli dove inserire il logo. Passando il mouse su una posizione, si evidenzia nell'anteprima.
+   - **Colore del logo**: *Originale* oppure *Cambia colore*, che ricolora tutto il logo in tinta unita (es. logo nero → giallo). Va fatto dopo aver tolto lo sfondo del file, altrimenti si colora anche quello.
+   - **Sfondo della grafica**: un colore (quelli presi dal logo, bianco, nero o uno qualsiasi) oppure **trasparente** (il primo quadratino a scacchi): il PNG di produzione avrà solo il logo. Nel mockup attorno al logo si vede la foto, quindi serve una foto senza vecchi loghi in quella posizione.
+   - Dimensione e posizione del logo.
+4. **Posizioni**: scegli dove inserire il logo; passando il mouse su una posizione, si evidenzia nell'anteprima. Se l'immagine ha delle **competizioni** (es. tappeti Inter), scegli *Domestico* o *Internazionale*: sulle posizioni fisse (i tappeti interni) va la grafica di quella competizione.
 5. **Salva**: scrivi il nome del brand e premi *Salva PNG + JPG*. Si ottengono:
    - `Brand_<tipologia>.png` (es. `Brand_CC.png`, `Brand_Retroporta_ground.png`) → file per la produzione
-   - `Brand_<tipologia>.jpg` → mockup da inviare al cliente
+   - `Brand_<tipologia>.jpg` → mockup da inviare al cliente; se c'è una competizione il suo nome è aggiunto al JPG (es. `Brand_MATS_Internazionale.jpg`)
 
 In anteprima: *Dettaglio* ingrandisce sulle posizioni, *Tieni premuto: originale* mostra la foto senza logo.
 
@@ -50,6 +53,7 @@ Nella scheda **Template**:
 1. *+ Nuovo* e scrivi il nome del cliente (per modificarne uno esistente, sceglilo dal menu).
 2. **Centro campo**: *+ Aggiungi immagine* → foto del centrocampo → tipologia *Centro campo* → *+ Aggiungi posizione*. Porta i 4 punti sulla linea del cerchio: *alto* e *basso* dove la linea di metà campo incrocia il cerchio, *destra* e *sinistra* all'altezza del dischetto. L'ellisse deve combaciare con il cerchio e il mirino cadere sul dischetto.
 3. **Tappeti, Additional, Retroporta ground e vertical**: *+ Aggiungi immagine* → foto → scegli la tipologia → *+ Aggiungi posizione* per ogni area. Porta i 4 angoli sull'area dove andrà la grafica, nell'ordine in cui si legge il logo (alto sx, alto dx, basso dx, basso sx).
+   - **Competizioni** (es. tappeti interni con sponsor diverso tra campionato e coppe): *+ Aggiungi competizione* per ogni grafica (stesso formato della tipologia, es. 900×100), dalle il nome (*Domestico*, *Internazionale*…) e spunta **fissa** sulle posizioni che la usano. Le posizioni fisse non ricevono il logo del brand; in *Crea mockup* compare la scelta della competizione.
 4. **Dai un nome chiaro alle posizioni** (es. *Esterno sinistra*): è quello che si vede in *Crea mockup*.
 5. **Bordo (px)**: lascia 0 con foto pulite; metti 0,6–0,7 se nella foto c'è già un vecchio logo da coprire.
 6. **Controlla** con *Mostra artwork di prova*: il motivo deve coprire esattamente la zona e la scritta *ALTO* deve stare dalla parte lontana del campo.

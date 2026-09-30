@@ -71,15 +71,24 @@
     }
   }
 
-  // Template → pacchetto cifrato: i dati (nomi, posizioni) e ogni foto sono cifrati separatamente.
+  // Template → pacchetto cifrato: i dati (nomi, posizioni) e ogni immagine (foto di base e grafiche
+  // delle competizioni) sono cifrati separatamente.
   async function cifraTemplate(chiave, t) {
     const immagini = [];
+    const cifraImmagine = async (url, descrizione) => {
+      const m = /^data:([^;,]+)?(;base64)?,(.*)$/s.exec(url || '');
+      if (!m || !m[2]) throw new Error('Immagine «' + descrizione + '» non leggibile');
+      immagini.push(await cifra(chiave, daBase64(m[3])));
+      return { indice: immagini.length - 1, tipo: m[1] || 'image/jpeg' };
+    };
     const scene = [];
     for (const s of t.scene) {
-      const m = /^data:([^;,]+)?(;base64)?,(.*)$/s.exec(s.immagine || '');
-      if (!m || !m[2]) throw new Error('Immagine della scena «' + s.nome + '» non leggibile');
-      immagini.push(await cifra(chiave, daBase64(m[3])));
-      scene.push(Object.assign({}, s, { immagine: { indice: immagini.length - 1, tipo: m[1] || 'image/jpeg' } }));
+      const copia = Object.assign({}, s, { immagine: await cifraImmagine(s.immagine, s.nome) });
+      if (Array.isArray(s.varianti)) {
+        copia.varianti = [];
+        for (const v of s.varianti) copia.varianti.push(Object.assign({}, v, { artwork: await cifraImmagine(v.artwork, v.nome) }));
+      }
+      scene.push(copia);
     }
     const dati = await cifraTesto(chiave, JSON.stringify(Object.assign({}, t, { scene })));
     return { id: t.id, v: 1, dati, immagini };
@@ -87,9 +96,10 @@
 
   async function decifraTemplate(chiave, pacchetto) {
     const t = JSON.parse(await decifraTesto(chiave, pacchetto.dati));
+    const immagine = async (rif) => 'data:' + rif.tipo + ';base64,' + aBase64(await decifra(chiave, pacchetto.immagini[rif.indice]));
     for (const s of t.scene) {
-      const bytes = await decifra(chiave, pacchetto.immagini[s.immagine.indice]);
-      s.immagine = 'data:' + s.immagine.tipo + ';base64,' + aBase64(bytes);
+      s.immagine = await immagine(s.immagine);
+      for (const v of s.varianti || []) v.artwork = await immagine(v.artwork);
     }
     t.id = pacchetto.id;
     return t;

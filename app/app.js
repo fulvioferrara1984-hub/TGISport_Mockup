@@ -19,12 +19,16 @@
     fonteComposto: null,
     passthrough: false,    // il PNG del cliente si può salvare identico
     composto: false,
-    p: { sfondo: '#ffffff', dimensione: MK.TIPI.CC.dimensione, offX: 0, offY: 0 },
+    p: { sfondo: '#ffffff', coloreLogo: null, dimensione: MK.TIPI.CC.dimensione, offX: 0, offY: 0 },
     coloreScelto: false,
+    ultimoColoreLogo: '#ffffff',
+    logoPieno: false,      // il logo elaborato ha ancora un fondo pieno (angoli opachi)
     rimuovi: 'no',
     coloreRimozione: '#ffffff',
     tolleranza: 40,
     attive: {},            // id scena -> Set(id posizioni)
+    variante: {},          // id scena -> id della competizione scelta
+    grafiche: {},          // id competizione -> canvas della grafica (scena corrente)
     brand: '',
     brandAutomatico: false,
     zoom: 'intera',
@@ -62,6 +66,11 @@
   }
   function nomeBase() {
     return (nomeBrand() || 'Brand') + '_' + formato().sigla;
+  }
+  // Il mockup cambia con la competizione, il PNG di produzione no: la competizione va solo nel nome del JPG.
+  function nomeJpg() {
+    const v = varianteScelta();
+    return nomeBase() + (v ? '_' + v.nome.trim().replace(/[\\/:*?"<>|]+/g, '').replace(/\s+/g, '_') : '');
   }
 
   function suggerisciBrand(nomeFile) {
@@ -174,11 +183,15 @@
     if (!scena) return;
     stato.scena = scena;
     $('sel-scena').value = id;
-    if (!stato.attive[scena.id]) stato.attive[scena.id] = new Set(scena.posizioni.map((p) => p.id));
+    if (!stato.attive[scena.id]) stato.attive[scena.id] = new Set(scena.posizioni.filter((p) => !p.fissa).map((p) => p.id));
+    const varianti = scena.varianti || [];
+    if (varianti.length && !varianti.some((v) => v.id === stato.variante[scena.id])) stato.variante[scena.id] = varianti[0].id;
     riempiPosizioni();
     caricamento(true);
     try {
       stato.immagine = await MK.template.immagineScena(scena);
+      stato.grafiche = {};
+      for (const v of varianti) stato.grafiche[v.id] = R.copia(await MK.template.immagineScena({ immagine: v.artwork }));
     } finally {
       caricamento(false);
     }
@@ -193,7 +206,8 @@
     const lista = $('lista-posizioni');
     lista.innerHTML = '';
     const attive = stato.attive[stato.scena.id];
-    for (const pos of stato.scena.posizioni) {
+    const scegliere = stato.scena.posizioni.filter((p) => !p.fissa);
+    for (const pos of scegliere) {
       const el = document.createElement('label');
       el.className = 'posizione' + (attive.has(pos.id) ? ' attiva' : '');
       const cb = document.createElement('input');
@@ -213,7 +227,45 @@
       el.addEventListener('mouseleave', () => { stato.evidenzia = null; disegnaSovrapposto(); });
       lista.appendChild(el);
     }
-    $('passo-posizioni').hidden = stato.scena.posizioni.length < 2;
+    riempiCompetizioni();
+    const conVarianti = !!(stato.scena.varianti && stato.scena.varianti.length);
+    $('etichetta-posizioni').hidden = !conVarianti;
+    $('campo-posizioni').hidden = scegliere.length < 2;
+    $('passo-posizioni').hidden = scegliere.length < 2 && !conVarianti;
+  }
+
+  // Competizioni (es. Domestico / Internazionale): decidono la grafica delle posizioni fisse.
+  function riempiCompetizioni() {
+    const varianti = stato.scena.varianti || [];
+    const box = $('sel-variante');
+    $('blocco-competizione').hidden = !varianti.length;
+    box.innerHTML = '';
+    for (const v of varianti) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.setAttribute('role', 'radio');
+      b.dataset.variante = v.id;
+      b.setAttribute('aria-checked', String(v.id === stato.variante[stato.scena.id]));
+      const nome = document.createElement('b');
+      nome.textContent = v.nome;
+      const img = document.createElement('img');
+      img.src = v.artwork;
+      img.alt = '';
+      b.append(nome, img);
+      b.addEventListener('mouseenter', () => { stato.evidenzia = '__fisse'; disegnaSovrapposto(); });
+      b.addEventListener('mouseleave', () => { stato.evidenzia = null; disegnaSovrapposto(); });
+      box.appendChild(b);
+    }
+  }
+
+  function varianteScelta() {
+    const varianti = (stato.scena && stato.scena.varianti) || [];
+    return varianti.find((v) => v.id === stato.variante[stato.scena.id]) || null;
+  }
+
+  function opzioniMockup(campioni) {
+    const v = varianteScelta();
+    return { campioni, grafica: v ? stato.grafiche[v.id] : null };
   }
 
   // ---------- logo ----------
@@ -261,6 +313,7 @@
       : grezzo;
     const canvas = L.rifila(lavoro);
     stato.logo = { canvas, raggio: L.raggioVisibile(canvas) };
+    stato.logoPieno = angoliOpachi(canvas);
     const an = L.analizzaColori(canvas);
     stato.colori = an.colori;
     if (nuovo) {
@@ -268,8 +321,30 @@
       if (!stato.coloreScelto) stato.p.sfondo = an.luminanza > 190 ? '#000000' : '#ffffff';
       stato.p.dimensione = MK.TIPI[stato.tipo].dimensione;
       stato.p.offX = stato.p.offY = 0;
+      stato.p.coloreLogo = null;
     }
     aggiornaControlli();
+  }
+
+  function angoliOpachi(c) {
+    const x = R.contesto(c);
+    return [[0, 0], [c.width - 1, 0], [0, c.height - 1], [c.width - 1, c.height - 1]]
+      .every(([px, py]) => x.getImageData(px, py, 1, 1).data[3] > 250);
+  }
+
+  // Logo in tinta unica (se richiesto): stessa forma e trasparenza, colore sostituito. Memorizzato finché non cambia.
+  let tinta = { sorgente: null, colore: null, canvas: null };
+  function logoPerComposizione() {
+    if (!stato.p.coloreLogo || !stato.logo) return stato.logo;
+    if (tinta.sorgente !== stato.logo.canvas || tinta.colore !== stato.p.coloreLogo) {
+      const c = R.copia(stato.logo.canvas);
+      const x = R.contesto(c);
+      x.globalCompositeOperation = 'source-in';
+      x.fillStyle = stato.p.coloreLogo;
+      x.fillRect(0, 0, c.width, c.height);
+      tinta = { sorgente: stato.logo.canvas, colore: stato.p.coloreLogo, canvas: c };
+    }
+    return { canvas: tinta.canvas, raggio: stato.logo.raggio };
   }
 
   function valutaComposto() {
@@ -359,8 +434,18 @@
     $('out-x').textContent = fmt(p.offX * 100);
     $('rng-y').value = p.offY * 100;
     $('out-y').textContent = fmt(p.offY * 100);
-    $('col-sfondo').value = p.sfondo;
-    if (document.activeElement !== $('hex-sfondo')) $('hex-sfondo').value = p.sfondo.toUpperCase();
+    if (p.sfondo) $('col-sfondo').value = p.sfondo;
+    if (document.activeElement !== $('hex-sfondo')) $('hex-sfondo').value = p.sfondo ? p.sfondo.toUpperCase() : '';
+    $('nota-trasparente').hidden = !!p.sfondo;
+    const inTinta = !!p.coloreLogo;
+    $('blocco-colore-logo').hidden = !(stato.sorgente && !stato.composto);
+    segna('#sel-colore-logo', 'coloreLogo', inTinta ? 'tinta' : 'originale');
+    $('campo-colore-logo').hidden = !inTinta;
+    $('col-logo').value = p.coloreLogo || stato.ultimoColoreLogo;
+    if (document.activeElement !== $('hex-logo')) $('hex-logo').value = (p.coloreLogo || stato.ultimoColoreLogo).toUpperCase();
+    $('nota-colore-logo').textContent = inTinta && stato.logoPieno
+      ? 'Il logo ha ancora il suo sfondo: toglilo qui sopra, altrimenti diventa un rettangolo pieno di colore.'
+      : '';
     $('rng-tol').value = stato.tolleranza;
     $('out-tol').textContent = stato.tolleranza;
     $('sel-rimuovi').value = stato.rimuovi;
@@ -377,6 +462,7 @@
       : togli ? '' : 'Se il logo ha un riquadro o uno sfondo da eliminare, scegli di togliere il suo colore.';
     $('passo-composizione').classList.toggle('disattivo', !!(stato.sorgente && stato.composto));
     riempiCampioni();
+    riempiCampioniLogo();
   }
 
   function fmt(v) {
@@ -393,6 +479,14 @@
       if (!visti.has(k)) { visti.add(k); lista.push(k); }
     }
     box.innerHTML = '';
+    const trasparente = document.createElement('button');
+    trasparente.type = 'button';
+    trasparente.className = 'campione trasparente';
+    trasparente.title = 'Nessuno sfondo (trasparente)';
+    trasparente.setAttribute('aria-label', 'Nessuno sfondo, trasparente');
+    trasparente.setAttribute('aria-pressed', String(!stato.p.sfondo));
+    trasparente.addEventListener('click', () => impostaSfondo(null));
+    box.appendChild(trasparente);
     lista.forEach((c, i) => {
       const b = document.createElement('button');
       b.type = 'button';
@@ -400,22 +494,56 @@
       b.style.background = c;
       b.title = c.toUpperCase() + (i < stato.colori.length ? ' (dal logo)' : '');
       b.setAttribute('aria-label', 'Sfondo ' + c.toUpperCase());
-      b.setAttribute('aria-pressed', String(c === stato.p.sfondo.toLowerCase()));
+      b.setAttribute('aria-pressed', String(c === (stato.p.sfondo || '').toLowerCase()));
       b.addEventListener('click', () => impostaSfondo(c));
       box.appendChild(b);
     });
-    if (stato.colori.length) {
-      const e = document.createElement('span');
-      e.className = 'campioni-etichetta';
-      e.textContent = 'Colori presi dal logo, poi bianco e nero';
-      box.appendChild(e);
+    const e = document.createElement('span');
+    e.className = 'campioni-etichetta';
+    e.textContent = stato.colori.length ? 'Trasparente, colori presi dal logo, bianco e nero' : 'Trasparente, bianco e nero';
+    box.appendChild(e);
+  }
+
+  function riempiCampioniLogo() {
+    const box = $('campioni-logo');
+    const visti = new Set();
+    box.innerHTML = '';
+    for (const c of ['#ffffff', '#000000'].concat(stato.colori)) {
+      const k = c.toLowerCase();
+      if (visti.has(k)) continue;
+      visti.add(k);
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'campione';
+      b.style.background = k;
+      b.title = k.toUpperCase();
+      b.setAttribute('aria-label', 'Logo ' + k.toUpperCase());
+      b.setAttribute('aria-pressed', String(k === (stato.p.coloreLogo || '').toLowerCase()));
+      b.addEventListener('click', () => impostaColoreLogo(k));
+      box.appendChild(b);
     }
   }
 
+  function impostaColoreLogo(hex) {
+    if (hex === null) {
+      stato.p.coloreLogo = null;
+    } else {
+      const rgb = L.daHex(hex);
+      if (!rgb) return;
+      stato.p.coloreLogo = stato.ultimoColoreLogo = L.inHex(rgb);
+    }
+    aggiornaControlli();
+    richiediRender();
+  }
+
   function impostaSfondo(hex) {
-    const rgb = L.daHex(hex);
-    if (!rgb) return;
-    stato.p.sfondo = L.inHex(rgb);
+    if (hex === null) {
+      stato.p.sfondo = null;
+    } else {
+      const rgb = L.daHex(hex);
+      if (!rgb) return;
+      stato.p.sfondo = L.inHex(rgb);
+    }
     stato.coloreScelto = true;
     aggiornaControlli();
     richiediRender();
@@ -442,8 +570,9 @@
       const k = Math.max(1, Math.min(3, fonte.width / f.w));
       stato.artworkHi = k > 1.05 ? C.adattaComposto(f, fonte, k) : stato.artwork;
     } else {
-      stato.artwork = C.componi(f, stato.logo, stato.p, 1);
-      stato.artworkHi = C.componi(f, stato.logo, stato.p, bozza ? 2 : 3);
+      const logo = logoPerComposizione();
+      stato.artwork = C.componi(f, logo, stato.p, 1);
+      stato.artworkHi = C.componi(f, logo, stato.p, bozza ? 2 : 3);
     }
   }
 
@@ -454,8 +583,8 @@
     const cv = $('cv-mockup');
     const ctx = cv.getContext('2d');
     ctx.clearRect(0, 0, cv.width, cv.height);
-    if (stato.artworkHi) {
-      const m = C.mockup(stato.immagine, stato.scena, stato.artworkHi, [...stato.attive[stato.scena.id]], { campioni: bozza ? 2 : 4 });
+    if (stato.artworkHi || varianteScelta()) {
+      const m = C.mockup(stato.immagine, stato.scena, stato.artworkHi, [...stato.attive[stato.scena.id]], opzioniMockup(bozza ? 2 : 4));
       ctx.drawImage(m, 0, 0);
     }
     disegnaSovrapposto();
@@ -496,8 +625,8 @@
     const attive = stato.attive[stato.scena.id];
     const scala = cv.width / 1920;
     for (const pos of stato.scena.posizioni) {
-      const evid = stato.evidenzia === pos.id;
-      const vuoto = !stato.sorgente && attive.has(pos.id);
+      const evid = stato.evidenzia === pos.id || (stato.evidenzia === '__fisse' && pos.fissa);
+      const vuoto = !stato.sorgente && !pos.fissa && attive.has(pos.id);
       if (!evid && !vuoto) continue;
       C.tracciaContorno(ctx, f, pos.punti);
       ctx.fillStyle = evid ? 'rgba(47, 85, 228, .28)' : 'rgba(255, 255, 255, .18)';
@@ -552,7 +681,7 @@
     const vuoto = !nomeBrand();
     $('uscite').innerHTML =
       '<li><code>' + esc(base) + '.png</code><span>produzione ' + f.w + '×' + f.h + '</span></li>' +
-      '<li><code>' + esc(base) + '.jpg</code><span>mockup ' + w + '×' + h + '</span></li>';
+      '<li><code>' + esc(nomeJpg()) + '.jpg</code><span>mockup ' + w + '×' + h + '</span></li>';
     $('uscite').style.opacity = vuoto ? '.5' : '1';
     const pronto = !!stato.sorgente;
     $('btn-salva').disabled = !pronto;
@@ -581,7 +710,7 @@
 
   async function blobJPG() {
     calcolaArtwork(false);
-    const m = C.mockup(stato.immagine, stato.scena, stato.artworkHi, [...stato.attive[stato.scena.id]], { campioni: 4 });
+    const m = C.mockup(stato.immagine, stato.scena, stato.artworkHi, [...stato.attive[stato.scena.id]], opzioniMockup(4));
     return A.canvasInBlob(m, 'image/jpeg', 0.95);
   }
 
@@ -604,7 +733,7 @@
       const base = nomeBase();
       const files = [];
       if (quali.includes('png')) files.push({ nome: base + '.png', blob: await blobPNG() });
-      if (quali.includes('jpg')) files.push({ nome: base + '.jpg', blob: await blobJPG() });
+      if (quali.includes('jpg')) files.push({ nome: nomeJpg() + '.jpg', blob: await blobJPG() });
       const nomi = files.map((f) => f.nome).join(' e ');
       if (inCartella) {
         const esistenti = [];
@@ -680,6 +809,25 @@
       if (/^#[0-9a-f]{6}$/i.test(v)) impostaSfondo(v);
     });
     $('hex-sfondo').addEventListener('blur', () => aggiornaControlli());
+    $('sel-colore-logo').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-colore-logo]');
+      if (b) impostaColoreLogo(b.dataset.coloreLogo === 'tinta' ? stato.ultimoColoreLogo : null);
+    });
+    $('col-logo').addEventListener('input', (e) => impostaColoreLogo(e.target.value));
+    $('hex-logo').addEventListener('input', (e) => {
+      let v = e.target.value.trim();
+      if (v && v[0] !== '#') v = '#' + v;
+      if (/^#[0-9a-f]{6}$/i.test(v)) impostaColoreLogo(v);
+    });
+    $('hex-logo').addEventListener('blur', () => aggiornaControlli());
+    $('sel-variante').addEventListener('click', (e) => {
+      const b = e.target.closest('button[data-variante]');
+      if (!b || !stato.scena) return;
+      stato.variante[stato.scena.id] = b.dataset.variante;
+      segna('#sel-variante', 'variante', b.dataset.variante);
+      aggiornaUscite();
+      richiediRender();
+    });
     $('rng-dim').addEventListener('input', (e) => { stato.p.dimensione = e.target.value / 100; aggiornaControlli(); richiediRender(); });
     $('rng-x').addEventListener('input', (e) => { stato.p.offX = e.target.value / 100; aggiornaControlli(); richiediRender(); });
     $('rng-y').addEventListener('input', (e) => { stato.p.offY = e.target.value / 100; aggiornaControlli(); richiediRender(); });

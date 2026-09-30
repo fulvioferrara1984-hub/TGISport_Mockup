@@ -202,7 +202,20 @@ input[type="range"] { width: 100%; accent-color: var(--accento); margin: 2px 0; 
 
 .link { border: 0; background: none; color: var(--accento); padding: 0; cursor: pointer; font-size: 12.5px; font-weight: 500; }
 .link:hover { text-decoration: underline; }
-#blocco-sfondo-logo { margin-top: 16px; padding-top: 14px; border-top: 1px dashed var(--linea); }
+.gruppo { padding-bottom: 6px; margin-bottom: 14px; border-bottom: 1px dashed var(--linea); }
+.gruppo .nota:last-child { margin-bottom: 10px; }
+.segmentato.compatto { margin-bottom: 0; }
+.segmentato.compatto button { padding: 7px 10px; align-items: center; }
+.segmentato.compatto button b { font-size: 13px; }
+.campione.trasparente {
+  background-color: #fff !important;
+  background-image: linear-gradient(45deg, #cfd3da 25%, transparent 25%), linear-gradient(-45deg, #cfd3da 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #cfd3da 75%), linear-gradient(-45deg, transparent 75%, #cfd3da 75%);
+  background-size: 8px 8px; background-position: 0 0, 0 4px, 4px -4px, -4px 0;
+}
+.segmentato.competizioni button img { display: block; width: 100%; height: auto; margin-top: 7px; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
+#campo-posizioni { margin-bottom: 0; }
+#nota-trasparente { margin-top: 8px; }
 
 .posizioni { display: flex; flex-direction: column; gap: 6px; }
 .posizione {
@@ -302,7 +315,10 @@ button.primario:disabled { background: #b7c3ee; cursor: not-allowed; }
 .voce .testo b { font-weight: 600; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .voce .testo small { font-size: 11.5px; color: var(--inchiostro-3); }
 .voce input[type="text"] { height: 28px; font-size: 13px; padding: 0 8px; }
-.voce .bordo { width: 64px; flex: none; }
+.voce .bordo { width: 54px; flex: none; }
+.voce .fissa { display: flex; align-items: center; gap: 4px; flex: none; font-size: 12px; color: var(--inchiostro-2); cursor: pointer; }
+.voce .fissa input { width: 14px; height: 14px; margin: 0; accent-color: var(--accento); }
+.voce.variante img { width: 96px; height: auto; object-fit: contain; border-radius: 3px; box-shadow: 0 0 0 1px rgba(0,0,0,.08); }
 .voce .bordo input { height: 28px; padding: 0 6px; font-size: 12.5px; }
 .pallino { width: 10px; height: 10px; border-radius: 50%; flex: none; }
 .punto { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding: 8px 10px; border-radius: 8px; background: #f0f1f4; font-size: 12.5px; }

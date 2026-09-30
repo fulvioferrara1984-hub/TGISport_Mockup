@@ -23,6 +23,7 @@
     vista: { s: 1, tx: 0, ty: 0 },
     immagine: null,
     composto: null,
+    grafiche: new Map(),   // grafica delle competizioni (dataURL -> canvas) per l'anteprima
     modificato: false,
     azione: null,
     inizializzato: false,
@@ -121,6 +122,7 @@
       document.querySelectorAll('#ed-tipo-scena button').forEach((b) => b.setAttribute('aria-checked', String(b.dataset.tipo === s.tipo)));
       $('ed-aiuto').innerHTML = AIUTO[s.tipo] || AIUTO[formato(s).forma === 'cerchio' ? 'CC' : 'rettangolo'];
       riempiPosizioni();
+      riempiVarianti();
     }
     aggiornaPunto();
     aggiornaNotaSalva();
@@ -170,12 +172,19 @@
     s.posizioni.forEach((p, i) => {
       const el = document.createElement('div');
       el.className = 'voce' + (p.id === ed.posId ? ' attiva' : '');
-      el.innerHTML = '<span class="pallino"></span><input type="text" aria-label="Nome posizione"><label class="bordo" title="Allarga il logo oltre i punti (in pixel) per coprire residui di un vecchio logo nella foto"><input type="number" min="0" max="5" step="0.1" aria-label="Bordo in pixel"></label><button type="button" class="icona" title="Elimina posizione" aria-label="Elimina posizione"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>';
+      el.innerHTML = '<span class="pallino"></span><input type="text" aria-label="Nome posizione"><label class="fissa" title="Posizione fissa: mostra la grafica della competizione scelta, non il logo del brand"><input type="checkbox" aria-label="Posizione fissa"><span>fissa</span></label><label class="bordo" title="Allarga il logo oltre i punti (in pixel) per coprire residui di un vecchio logo nella foto"><input type="number" min="0" max="5" step="0.1" aria-label="Bordo in pixel"></label><button type="button" class="icona" title="Elimina posizione" aria-label="Elimina posizione"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>';
       el.querySelector('.pallino').style.background = COLORI[i % COLORI.length];
       const nome = el.querySelector('input[type=text]');
       nome.value = p.nome;
       nome.addEventListener('input', () => { p.nome = nome.value; segnaModifica(); });
       nome.addEventListener('change', () => { if (!p.nome.trim()) { p.nome = 'Posizione ' + (i + 1); nome.value = p.nome; } });
+      const fissa = el.querySelector('.fissa input');
+      fissa.checked = !!p.fissa;
+      fissa.addEventListener('change', () => {
+        if (fissa.checked) p.fissa = true; else delete p.fissa;
+        segnaModifica();
+        ricomponi(false);
+      });
       const bordo = el.querySelector('input[type=number]');
       bordo.value = p.bordo || 0;
       bordo.addEventListener('change', () => {
@@ -185,7 +194,7 @@
         ricomponi(false);
       });
       el.addEventListener('click', (e) => {
-        if (e.target.closest('button,input')) return;
+        if (e.target.closest('button,input,label')) return;
         seleziona(p.id, null);
       });
       el.querySelector('button').addEventListener('click', () => {
@@ -203,6 +212,63 @@
       n.textContent = 'Nessuna posizione: aggiungine una e trascina i punti sulla foto.';
       box.appendChild(n);
     }
+  }
+
+  function riempiVarianti() {
+    const s = scena();
+    const box = $('ed-varianti');
+    box.innerHTML = '';
+    for (const v of s.varianti || []) {
+      const el = document.createElement('div');
+      el.className = 'voce variante';
+      el.innerHTML = '<img alt=""><input type="text" aria-label="Nome della competizione"><button type="button" class="icona" title="Elimina competizione" aria-label="Elimina competizione"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>';
+      el.querySelector('img').src = v.artwork;
+      const nome = el.querySelector('input');
+      nome.value = v.nome;
+      nome.addEventListener('input', () => { v.nome = nome.value; segnaModifica(); });
+      nome.addEventListener('change', () => { if (!v.nome.trim()) { v.nome = 'Competizione'; nome.value = v.nome; } });
+      el.querySelector('button').addEventListener('click', () => {
+        s.varianti = s.varianti.filter((x) => x !== v);
+        if (!s.varianti.length) delete s.varianti;
+        segnaModifica();
+        aggiornaTutto();
+        ricomponi(false);
+      });
+      box.appendChild(el);
+    }
+  }
+
+  async function aggiungiVariante(file) {
+    const s = scena();
+    if (!s) return;
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return avvisa('Usa un\'immagine JPG o PNG per la grafica della competizione.', 'errore');
+    try {
+      const url = await MK.loghi.leggiComeDataURL(file);
+      const img = await MK.loghi.caricaImmagine(url);
+      const f = formato(s);
+      const nome = file.name.replace(/\.[a-z0-9]+$/i, '');
+      s.varianti = s.varianti || [];
+      s.varianti.push({ id: idUnico(T.slug(nome), s.varianti.map((v) => v.id)), nome, artwork: url });
+      segnaModifica();
+      aggiornaTutto();
+      ricomponi(false);
+      const w = img.naturalWidth, h = img.naturalHeight;
+      if (Math.abs(w / h - f.w / f.h) > 0.02 * (f.w / f.h)) avvisa('La grafica è ' + w + '×' + h + ': ha proporzioni diverse dal formato ' + f.w + '×' + f.h + ' e verrà adattata.', 'errore');
+      else avvisa('Competizione aggiunta: dalle il nome (es. «Domestico») e segna come fisse le posizioni che la usano.', 'ok');
+    } catch (e) {
+      avvisa(e.message, 'errore');
+    }
+  }
+
+  // Nell'anteprima dell'editor le posizioni fisse mostrano la grafica della prima competizione.
+  function graficaAnteprima(s) {
+    const v = s.varianti && s.varianti[0];
+    if (!v) return null;
+    if (!ed.grafiche.has(v.artwork)) {
+      ed.grafiche.set(v.artwork, null);
+      MK.loghi.caricaImmagine(v.artwork).then((img) => { ed.grafiche.set(v.artwork, MK.render.copia(img)); ricomponi(false); }).catch(() => {});
+    }
+    return ed.grafiche.get(v.artwork);
   }
 
   function seleziona(posId, punto) {
@@ -270,13 +336,15 @@
     if (!s || !ed.immagine) { ed.composto = null; disegna(); return; }
     if (!$('ed-prova').checked || !s.posizioni.length) { ed.composto = null; disegna(); return; }
     const f = formato(s);
-    const art = C.artworkProva(f);
+    const prova = C.artworkProva(f);
+    const grafica = graficaAnteprima(s);
     const c = MK.render.creaCanvas(ed.immagine.naturalWidth, ed.immagine.naturalHeight);
     MK.render.contesto(c).drawImage(ed.immagine, 0, 0);
     for (const p of s.posizioni) {
+      const art = p.fissa && grafica ? grafica : prova;
       try {
         const H = G.omografiaPosizione(f.forma, art.width, art.height, p.punti, p.bordo);
-        MK.render.deforma(c, art, H, { campioni: bozza ? 1 : 3, opacita: 0.82 });
+        MK.render.deforma(c, art, H, { campioni: bozza ? 1 : 3, opacita: art === prova ? 0.82 : 1 });
       } catch (e) { /* punti degeneri durante il trascinamento */ }
     }
     ed.composto = c;
@@ -760,6 +828,7 @@
       if (b) cambiaTipo(b.dataset.tipo);
     });
     $('ed-aggiungi-pos').addEventListener('click', aggiungiPosizione);
+    $('ed-file-variante').addEventListener('change', (e) => { if (e.target.files[0]) aggiungiVariante(e.target.files[0]); e.target.value = ''; });
     $('ed-prova').addEventListener('change', () => ricomponi(false));
     for (const [id, i] of [['ed-punto-x', 0], ['ed-punto-y', 1]]) {
       $(id).addEventListener('change', (e) => {

@@ -24,7 +24,7 @@
   }
 
   /**
-   * Artwork composto: sfondo tinta unita + logo centrato (scalato e spostabile).
+   * Artwork composto: sfondo tinta unita (oppure trasparente se p.sfondo è null) + logo centrato (scalato e spostabile).
    * Per il cerchio il logo è inscritto in base alla sua forma reale, poi tutto viene ritagliato a disco.
    *  logo: { canvas, raggio }  ·  p: { sfondo, dimensione, offX, offY }  ·  scala: moltiplicatore di risoluzione
    */
@@ -32,8 +32,10 @@
     const W = Math.round(formato.w * scala), H = Math.round(formato.h * scala);
     const c = R.creaCanvas(W, H);
     const x = R.contesto(c);
-    x.fillStyle = p.sfondo;
-    x.fillRect(0, 0, W, H);
+    if (p.sfondo) {
+      x.fillStyle = p.sfondo;
+      x.fillRect(0, 0, W, H);
+    }
     if (logo) {
       const lw = logo.canvas.width, lh = logo.canvas.height;
       const s0 = formato.forma === 'cerchio' ? W / 2 / logo.raggio : Math.min(W / lw, H / lh);
@@ -106,16 +108,21 @@
     return c;
   }
 
-  /** Disegna il mockup: immagine di base + artwork deformato in ogni posizione richiesta. */
+  /**
+   * Disegna il mockup: immagine di base, poi la grafica della competizione nelle posizioni fisse
+   * (opzioni.grafica, se c'è) e infine l'artwork del brand nelle posizioni scelte.
+   */
   function mockup(immagine, scena, artwork, idPosizioni, opzioni) {
     const c = R.creaCanvas(immagine.naturalWidth || immagine.width, immagine.naturalHeight || immagine.height);
     R.contesto(c).drawImage(immagine, 0, 0);
     const formato = formatoScena(scena);
-    for (const pos of scena.posizioni) {
-      if (!idPosizioni.includes(pos.id)) continue;
-      const H = MK.geo.omografiaPosizione(formato.forma, artwork.width, artwork.height, pos.punti, pos.bordo);
-      R.deforma(c, artwork, H, opzioni);
-    }
+    const disegna = (art, pos) => {
+      const H = MK.geo.omografiaPosizione(formato.forma, art.width, art.height, pos.punti, pos.bordo);
+      R.deforma(c, art, H, opzioni);
+    };
+    const grafica = opzioni && opzioni.grafica;
+    if (grafica) for (const pos of scena.posizioni) if (pos.fissa) disegna(grafica, pos);
+    if (artwork) for (const pos of scena.posizioni) if (!pos.fissa && idPosizioni.includes(pos.id)) disegna(artwork, pos);
     return c;
   }
 
