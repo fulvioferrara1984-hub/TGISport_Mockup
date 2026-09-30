@@ -108,15 +108,63 @@
     return c;
   }
 
+  // ---------- spessore dei tappeti (solo nel mockup) ----------
+  // Il "retro" del tappeto è la faccia spostata in alto e verso il lato corto scelto: la sagoma grigia è
+  // l'inviluppo convesso di faccia e retro, poi la grafica copre la faccia e resta visibile solo lo spessore.
+  const SPESSORE_PREDEFINITO = { colore: '#a0a0a0', profondita: 4, lato: 'auto' };
+
+  function vettoreSpessore(spessore, punti) {
+    const d = Number(spessore && spessore.profondita) || 0;
+    if (d <= 0) return null;
+    let lato = spessore.lato;
+    if (lato !== 'sinistra' && lato !== 'destra') {
+      // automatico: si vede il lato corto più basso nella foto (quello più vicino alla telecamera)
+      const ySinistra = (punti[0][1] + punti[3][1]) / 2, yDestra = (punti[1][1] + punti[2][1]) / 2;
+      lato = ySinistra >= yDestra ? 'sinistra' : 'destra';
+    }
+    return [lato === 'sinistra' ? -d : d, -d];
+  }
+
+  function inviluppoConvesso(punti) {
+    const p = punti.slice().sort((a, b) => a[0] - b[0] || a[1] - b[1]);
+    const giro = (o, a, b) => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0]);
+    const sotto = [], sopra = [];
+    for (const q of p) {
+      while (sotto.length >= 2 && giro(sotto[sotto.length - 2], sotto[sotto.length - 1], q) <= 0) sotto.pop();
+      sotto.push(q);
+    }
+    for (let i = p.length - 1; i >= 0; i--) {
+      const q = p[i];
+      while (sopra.length >= 2 && giro(sopra[sopra.length - 2], sopra[sopra.length - 1], q) <= 0) sopra.pop();
+      sopra.push(q);
+    }
+    return sotto.slice(0, -1).concat(sopra.slice(0, -1));
+  }
+
+  function disegnaSpessore(ctx, spessore, punti) {
+    const e = vettoreSpessore(spessore, punti);
+    if (!e) return;
+    const sagoma = inviluppoConvesso(punti.concat(punti.map(([x, y]) => [x + e[0], y + e[1]])));
+    ctx.beginPath();
+    sagoma.forEach(([x, y], i) => (i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)));
+    ctx.closePath();
+    ctx.fillStyle = spessore.colore || SPESSORE_PREDEFINITO.colore;
+    ctx.fill();
+  }
+
   /**
    * Disegna il mockup: immagine di base, poi la grafica della competizione nelle posizioni fisse
    * (opzioni.grafica, se c'è) e infine l'artwork del brand nelle posizioni scelte.
+   * Se l'immagine ha lo spessore impostato, ogni tappeto disegnato riceve prima la sua sagoma grigia.
    */
   function mockup(immagine, scena, artwork, idPosizioni, opzioni) {
     const c = R.creaCanvas(immagine.naturalWidth || immagine.width, immagine.naturalHeight || immagine.height);
-    R.contesto(c).drawImage(immagine, 0, 0);
+    const ctx = R.contesto(c);
+    ctx.drawImage(immagine, 0, 0);
     const formato = formatoScena(scena);
+    const spessore = formato.forma === 'rettangolo' ? scena.spessore : null;
     const disegna = (art, pos) => {
+      if (spessore) disegnaSpessore(ctx, spessore, pos.punti);
       const H = MK.geo.omografiaPosizione(formato.forma, art.width, art.height, pos.punti, pos.bordo);
       R.deforma(c, art, H, opzioni);
     };
@@ -142,5 +190,5 @@
     ctx.closePath();
   }
 
-  MK.composizione = { descrizioneFormato, formatoScena, componi, adattaComposto, artworkProva, mockup, mascheraCerchio, tracciaContorno };
+  MK.composizione = { SPESSORE_PREDEFINITO, disegnaSpessore, descrizioneFormato, formatoScena, componi, adattaComposto, artworkProva, mockup, mascheraCerchio, tracciaContorno };
 })(window.MK = window.MK || {});

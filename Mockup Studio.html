@@ -208,11 +208,10 @@
           <div class="segmentato griglia" id="ed-tipo-scena" role="radiogroup" aria-label="Tipologia dell'immagine"></div>
           <h3>Posizioni</h3>
           <div class="lista" id="ed-posizioni"></div>
-          <button type="button" class="bottone pieno" id="ed-aggiungi-pos">+ Aggiungi posizione</button>
-          <h3>Competizioni</h3>
-          <p class="nota">Per le aree con una grafica che cambia con la competizione (es. tappeti interni: <i>Domestico</i> / <i>Internazionale</i>): aggiungi una grafica per competizione e segna quelle posizioni come <b>fisse</b>. Le posizioni fisse non ricevono il logo del brand.</p>
-          <div class="lista" id="ed-varianti"></div>
-          <label class="bottone pieno">+ Aggiungi competizione<input type="file" id="ed-file-variante" accept="image/png,image/jpeg,image/webp" hidden></label>
+          <div class="secondari">
+            <button type="button" id="ed-aggiungi-pos">+ Posizione logo</button>
+            <button type="button" id="ed-aggiungi-comp">+ Posizione competizione</button>
+          </div>
           <div class="punto" id="ed-punto" hidden>
             <span id="ed-punto-nome"></span>
             <label>X <input type="number" id="ed-punto-x" step="0.1"></label>
@@ -220,6 +219,39 @@
           </div>
           <label class="spunta"><input type="checkbox" id="ed-prova" checked><span>Mostra artwork di prova</span></label>
           <p class="nota" id="ed-aiuto"></p>
+
+          <div id="ed-blocco-competizioni">
+            <h3>Competizioni</h3>
+            <p class="nota">Le posizioni <b>Competizione</b> (es. i tappeti interni) mostrano la grafica della competizione scelta in <i>Crea mockup</i>, per esempio <i>Domestico</i> = enilive e <i>Internazionale</i> = 1xbet, e non ricevono il logo del brand.</p>
+            <div class="lista" id="ed-varianti"></div>
+            <div class="secondari">
+              <label class="bottone">+ Aggiungi grafica<input type="file" id="ed-file-variante" accept="image/png,image/jpeg,image/webp" hidden></label>
+              <select id="ed-copia-comp" aria-label="Copia le competizioni da un altro cliente"><option value="">Copia da un cliente…</option></select>
+            </div>
+          </div>
+
+          <div id="ed-blocco-spessore" hidden>
+            <h3>Spessore dei tappeti</h3>
+            <label class="spunta"><input type="checkbox" id="ed-spessore"><span>Aggiungi lo spessore nel mockup</span></label>
+            <div id="ed-spessore-campi" hidden>
+              <div class="campo">
+                <span>Colore</span>
+                <div class="colore">
+                  <input type="color" id="ed-spessore-colore" value="#a0a0a0" aria-label="Colore dello spessore">
+                  <input type="text" id="ed-spessore-hex" maxlength="7" spellcheck="false" aria-label="Codice del colore dello spessore">
+                </div>
+              </div>
+              <label class="campo cursore"><span>Profondità <output id="ed-spessore-out"></output></span><input type="range" id="ed-spessore-prof" min="1" max="20" step="0.5"></label>
+              <label class="campo"><span>Lato</span>
+                <select id="ed-spessore-lato">
+                  <option value="auto">Automatico: in alto e sul lato corto più basso</option>
+                  <option value="sinistra">Porta a sinistra: in alto e a sinistra</option>
+                  <option value="destra">Porta a destra: in alto e a destra</option>
+                </select>
+              </label>
+            </div>
+            <p class="nota">Vale per tutti i tappeti di questa immagine, anche quelli delle competizioni. Il PNG di produzione resta senza spessore.</p>
+          </div>
         </section>
 
         <section class="passo">
@@ -246,7 +278,7 @@
           <button type="button" class="piccolo" id="ed-100">100%</button>
           <span class="misura" id="ed-zoom"></span>
           <span class="spazio"></span>
-          <span class="suggerimento">Rotella: zoom · Trascina lo sfondo: sposta · Frecce: muovi il punto (⇧ ×10, ⌥ ×0,1)</span>
+          <span class="suggerimento">Rotella: zoom · Trascina una posizione: la sposti tutta · Spazio + trascina: sposti la vista · Frecce: punto o posizione (⇧ ×10, ⌥ ×0,1)</span>
         </div>
         <div class="palco editor" id="ed-palco" tabindex="0">
           <canvas id="ed-canvas"></canvas>

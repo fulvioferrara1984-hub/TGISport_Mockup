@@ -123,6 +123,8 @@
       $('ed-aiuto').innerHTML = AIUTO[s.tipo] || AIUTO[formato(s).forma === 'cerchio' ? 'CC' : 'rettangolo'];
       riempiPosizioni();
       riempiVarianti();
+      aggiornaSpessore();
+      riempiCopiaCompetizioni();
     }
     aggiornaPunto();
     aggiornaNotaSalva();
@@ -169,21 +171,29 @@
     const s = scena();
     const box = $('ed-posizioni');
     box.innerHTML = '';
+    const rettangolo = formato(s).forma === 'rettangolo';
     s.posizioni.forEach((p, i) => {
       const el = document.createElement('div');
-      el.className = 'voce' + (p.id === ed.posId ? ' attiva' : '');
-      el.innerHTML = '<span class="pallino"></span><input type="text" aria-label="Nome posizione"><label class="fissa" title="Posizione fissa: mostra la grafica della competizione scelta, non il logo del brand"><input type="checkbox" aria-label="Posizione fissa"><span>fissa</span></label><label class="bordo" title="Allarga il logo oltre i punti (in pixel) per coprire residui di un vecchio logo nella foto"><input type="number" min="0" max="5" step="0.1" aria-label="Bordo in pixel"></label><button type="button" class="icona" title="Elimina posizione" aria-label="Elimina posizione"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>';
+      el.className = 'voce posizione-ed' + (p.id === ed.posId ? ' attiva' : '');
+      el.innerHTML = '<div class="riga"><span class="pallino"></span><input type="text" aria-label="Nome posizione"><button type="button" class="icona" title="Elimina posizione" aria-label="Elimina posizione"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>' +
+        '<div class="riga dettagli"><div class="ruolo" role="radiogroup" aria-label="Contenuto della posizione"><button type="button" role="radio" data-ruolo="logo" title="Riceve il logo del brand">Logo</button><button type="button" role="radio" data-ruolo="competizione" title="Mostra la grafica della competizione scelta (es. enilive / 1xbet)">Competizione</button></div>' +
+        '<label class="bordo" title="Allarga la grafica oltre i punti (in pixel) per coprire residui di un vecchio logo nella foto">Bordo <input type="number" min="0" max="5" step="0.1" aria-label="Bordo in pixel"> px</label></div>';
       el.querySelector('.pallino').style.background = COLORI[i % COLORI.length];
       const nome = el.querySelector('input[type=text]');
       nome.value = p.nome;
       nome.addEventListener('input', () => { p.nome = nome.value; segnaModifica(); });
       nome.addEventListener('change', () => { if (!p.nome.trim()) { p.nome = 'Posizione ' + (i + 1); nome.value = p.nome; } });
-      const fissa = el.querySelector('.fissa input');
-      fissa.checked = !!p.fissa;
-      fissa.addEventListener('change', () => {
-        if (fissa.checked) p.fissa = true; else delete p.fissa;
+      const ruolo = el.querySelector('.ruolo');
+      ruolo.hidden = !rettangolo;
+      ruolo.querySelectorAll('button').forEach((b) => b.setAttribute('aria-checked', String((b.dataset.ruolo === 'competizione') === !!p.fissa)));
+      ruolo.addEventListener('click', (e) => {
+        const b = e.target.closest('button[data-ruolo]');
+        if (!b) return;
+        if (b.dataset.ruolo === 'competizione') p.fissa = true; else delete p.fissa;
+        ruolo.querySelectorAll('button').forEach((x) => x.setAttribute('aria-checked', String(x === b)));
         segnaModifica();
         ricomponi(false);
+        if (p.fissa && !(s.varianti && s.varianti.length)) copiaCompetizioni(null, true);
       });
       const bordo = el.querySelector('input[type=number]');
       bordo.value = p.bordo || 0;
@@ -197,7 +207,7 @@
         if (e.target.closest('button,input,label')) return;
         seleziona(p.id, null);
       });
-      el.querySelector('button').addEventListener('click', () => {
+      el.querySelector('.riga .icona').addEventListener('click', () => {
         s.posizioni = s.posizioni.filter((x) => x !== p);
         if (ed.posId === p.id) { ed.posId = s.posizioni.length ? s.posizioni[0].id : null; ed.punto = null; }
         segnaModifica();
@@ -209,7 +219,7 @@
     if (!s.posizioni.length) {
       const n = document.createElement('p');
       n.className = 'nota';
-      n.textContent = 'Nessuna posizione: aggiungine una e trascina i punti sulla foto.';
+      n.textContent = 'Nessuna posizione: aggiungine una, trascinala sulla zona giusta e poi sistema i punti.';
       box.appendChild(n);
     }
   }
@@ -260,6 +270,52 @@
     }
   }
 
+  // Altri clienti che hanno già delle competizioni (es. Domestico = enilive, Internazionale = 1xbet).
+  async function fontiCompetizioni() {
+    const fonti = [];
+    for (const v of T.elenco) {
+      if (ed.template && v.id === ed.template.id) continue;
+      try {
+        const t = await T.carica(v.id);
+        const sc = t.scene.find((x) => Array.isArray(x.varianti) && x.varianti.length);
+        if (sc) fonti.push({ id: v.id, nome: t.nome, varianti: sc.varianti });
+      } catch (e) { /* template non leggibile: lo salto */ }
+    }
+    return fonti;
+  }
+
+  async function riempiCopiaCompetizioni() {
+    const sel = $('ed-copia-comp');
+    const fonti = await fontiCompetizioni();
+    sel.innerHTML = '<option value="">Copia da un cliente…</option>';
+    for (const f of fonti) {
+      const o = document.createElement('option');
+      o.value = f.id;
+      o.textContent = f.nome + ' (' + f.varianti.map((v) => v.nome).join(', ') + ')';
+      sel.appendChild(o);
+    }
+    sel.disabled = !fonti.length;
+    sel.title = fonti.length ? '' : 'Nessun altro cliente ha competizioni da copiare';
+  }
+
+  // Copia le competizioni di un altro cliente nell'immagine selezionata (automatico = prima fonte disponibile).
+  async function copiaCompetizioni(idFonte, automatico) {
+    const s = scena();
+    if (!s) return;
+    const fonti = await fontiCompetizioni();
+    const fonte = idFonte ? fonti.find((f) => f.id === idFonte) : fonti[0];
+    if (!fonte) {
+      if (automatico) avvisa('Aggiungi qui sotto le grafiche delle competizioni (es. enilive per Domestico, 1xbet per Internazionale).', 'ok');
+      return;
+    }
+    if (s.varianti && s.varianti.length && !window.confirm('Sostituire le competizioni di questa immagine con quelle di «' + fonte.nome + '»?')) return;
+    s.varianti = JSON.parse(JSON.stringify(fonte.varianti));
+    segnaModifica();
+    aggiornaTutto();
+    ricomponi(false);
+    avvisa('Competizioni copiate da «' + fonte.nome + '»: ' + s.varianti.map((v) => v.nome).join(', ') + '.', 'ok');
+  }
+
   // Nell'anteprima dell'editor le posizioni fisse mostrano la grafica della prima competizione.
   function graficaAnteprima(s) {
     const v = s.varianti && s.varianti[0];
@@ -269,6 +325,36 @@
       MK.loghi.caricaImmagine(v.artwork).then((img) => { ed.grafiche.set(v.artwork, MK.render.copia(img)); ricomponi(false); }).catch(() => {});
     }
     return ed.grafiche.get(v.artwork);
+  }
+
+  function aggiornaSpessore() {
+    const s = scena();
+    const rettangolo = !!s && formato(s).forma === 'rettangolo';
+    $('ed-blocco-spessore').hidden = !rettangolo;
+    $('ed-blocco-competizioni').hidden = !rettangolo;
+    $('ed-aggiungi-comp').hidden = !rettangolo;
+    $('ed-aggiungi-pos').textContent = rettangolo ? '+ Posizione logo' : '+ Aggiungi posizione';
+    if (!rettangolo) return;
+    const sp = s.spessore;
+    $('ed-spessore').checked = !!sp;
+    $('ed-spessore-campi').hidden = !sp;
+    if (!sp) return;
+    $('ed-spessore-colore').value = sp.colore;
+    if (document.activeElement !== $('ed-spessore-hex')) $('ed-spessore-hex').value = sp.colore.toUpperCase();
+    $('ed-spessore-prof').value = sp.profondita;
+    $('ed-spessore-out').textContent = String(sp.profondita).replace('.', ',') + ' px';
+    $('ed-spessore-lato').value = sp.lato || 'auto';
+  }
+
+  function modificaSpessore(cambi) {
+    const s = scena();
+    if (!s || !s.spessore) return;
+    Object.assign(s.spessore, cambi);
+    segnaModifica();
+    aggiornaSpessore();
+    ricomponiPresto();
+    clearTimeout(ed.timerSpessore);
+    ed.timerSpessore = setTimeout(() => ricomponi(false), 300);
   }
 
   function seleziona(posId, punto) {
@@ -340,8 +426,10 @@
     const grafica = graficaAnteprima(s);
     const c = MK.render.creaCanvas(ed.immagine.naturalWidth, ed.immagine.naturalHeight);
     MK.render.contesto(c).drawImage(ed.immagine, 0, 0);
+    const ctx = MK.render.contesto(c);
     for (const p of s.posizioni) {
       const art = p.fissa && grafica ? grafica : prova;
+      if (s.spessore && f.forma === 'rettangolo') C.disegnaSpessore(ctx, s.spessore, p.punti);
       try {
         const H = G.omografiaPosizione(f.forma, art.width, art.height, p.punti, p.bordo);
         MK.render.deforma(c, art, H, { campioni: bozza ? 1 : 3, opacita: art === prova ? 0.82 : 1 });
@@ -481,6 +569,24 @@
     return null;
   }
 
+  // Posizione che contiene il punto (x, y) dello schermo: per spostarla tutta insieme.
+  function posizioneSotto(x, y) {
+    const s = scena();
+    if (!s) return null;
+    const f = formato(s);
+    const m = aImmagine(x, y);
+    const ordine = s.posizioni.slice().sort((a, b) => (a.id === ed.posId ? -1 : b.id === ed.posId ? 1 : 0));
+    for (const p of ordine) {
+      try {
+        const Hi = G.inversa(G.omografia(G.puntiArtwork(f.forma, 1, 1), p.punti));
+        const [u, v] = G.applica(Hi, m[0], m[1]);
+        const dentro = f.forma === 'cerchio' ? (u - 0.5) ** 2 + (v - 0.5) ** 2 <= 0.25 : u >= 0 && u <= 1 && v >= 0 && v <= 1;
+        if (dentro) return p;
+      } catch (e) { /* punti degeneri */ }
+    }
+    return null;
+  }
+
   function coordinate(e) {
     const r = $('ed-palco').getBoundingClientRect();
     return [e.clientX - r.left, e.clientY - r.top];
@@ -492,13 +598,19 @@
     const vicino = e.button === 0 ? puntoVicino(x, y) : null;
     try { $('ed-palco').setPointerCapture(e.pointerId); } catch (err) { /* puntatore non catturabile */ }
     $('ed-palco').focus({ preventScroll: true });
-    if (vicino) {
+    const sotto = e.button === 0 && !vicino && !ed.spazio ? posizioneSotto(x, y) : null;
+    if (vicino && !ed.spazio) {
       seleziona(vicino.pos.id, vicino.k);
       const q = vicino.pos.punti[vicino.k];
       const m = aImmagine(x, y);
       ed.azione = { tipo: 'punto', dx: q[0] - m[0], dy: q[1] - m[1] };
       $('ed-palco').classList.add('maniglia');
       disegna();
+    } else if (sotto) {
+      seleziona(sotto.id, null);
+      const m = aImmagine(x, y);
+      ed.azione = { tipo: 'sposta', x0: m[0], y0: m[1], originali: sotto.punti.map((q) => q.slice()) };
+      $('ed-palco').classList.add('sposta');
     } else {
       ed.azione = { tipo: 'pan', x, y, tx: ed.vista.tx, ty: ed.vista.ty, mosso: false };
       $('ed-palco').classList.add('trascina');
@@ -509,10 +621,18 @@
     const [x, y] = coordinate(e);
     const a = ed.azione;
     if (!a || a.tastiera) {
-      $('ed-palco').classList.toggle('maniglia', !!puntoVicino(x, y));
+      const suPunto = !ed.spazio && !!puntoVicino(x, y);
+      $('ed-palco').classList.toggle('maniglia', suPunto);
+      $('ed-palco').classList.toggle('sposta', !suPunto && !ed.spazio && !!posizioneSotto(x, y));
       return;
     }
-    if (a.tipo === 'punto') {
+    if (a.tipo === 'sposta') {
+      const m = aImmagine(x, y);
+      const dx = m[0] - a.x0, dy = m[1] - a.y0;
+      posizione().punti = a.originali.map(([qx, qy]) => [arrot(qx + dx), arrot(qy + dy)]);
+      segnaModifica();
+      ricomponiPresto();
+    } else if (a.tipo === 'punto') {
       const m = aImmagine(x, y);
       const p = posizione();
       p.punti[ed.punto] = [arrot(m[0] + a.dx), arrot(m[1] + a.dy)];
@@ -530,9 +650,9 @@
   function su() {
     const a = ed.azione;
     ed.azione = null;
-    $('ed-palco').classList.remove('trascina', 'maniglia');
+    $('ed-palco').classList.remove('trascina', 'maniglia', 'sposta');
     $('ed-lente').hidden = true;
-    if (a && a.tipo === 'punto') ricomponi(false);
+    if (a && (a.tipo === 'punto' || a.tipo === 'sposta')) ricomponi(false);
     else if (a && a.tipo === 'pan' && !a.mosso) { ed.punto = null; aggiornaPunto(); disegna(); }
   }
 
@@ -545,12 +665,20 @@
 
   function tasto(e) {
     const p = posizione();
-    if (!p || ed.punto == null) return;
+    if (!p) return;
     const passi = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
     const d = passi[e.key];
     if (!d) return;
     e.preventDefault();
     const k = e.shiftKey ? 10 : e.altKey ? 0.1 : 1;
+    if (ed.punto == null) {
+      p.punti = p.punti.map(([x, y]) => [arrot(x + d[0] * k), arrot(y + d[1] * k)]);
+      segnaModifica();
+      ricomponiPresto();
+      clearTimeout(ed.timerTasto);
+      ed.timerTasto = setTimeout(() => ricomponi(false), 400);
+      return;
+    }
     const q = p.punti[ed.punto];
     p.punti[ed.punto] = [arrot(q[0] + d[0] * k), arrot(q[1] + d[1] * k)];
     segnaModifica();
@@ -649,6 +777,7 @@
           // stessa inquadratura a un'altra risoluzione: i punti vengono riportati in scala
           const k = w / vw;
           for (const p of s.posizioni) p.punti = p.punti.map(([x, y]) => [arrot(x * k), arrot(y * k)]);
+          if (s.spessore) s.spessore.profondita = Math.round(s.spessore.profondita * k * 2) / 2;
           avviso = ' Posizioni riportate alla nuova misura (' + w + '×' + h + ').';
         } else {
           if (!window.confirm('La nuova foto è ' + w + '×' + h + ', la precedente ' + vw + '×' + vh + ': le proporzioni sono diverse, quindi le posizioni andranno ricontrollate una per una.\nSostituire comunque?')) return;
@@ -666,9 +795,10 @@
     }
   }
 
-  function aggiungiPosizione() {
+  function aggiungiPosizione(ruolo) {
     const s = scena();
     if (!s || !ed.immagine) return;
+    const competizione = ruolo === 'competizione';
     const f = formato(s);
     const { w, h } = dimPalco();
     const c = aImmagine(w / 2, h / 2);
@@ -683,18 +813,22 @@
       punti = [[c[0] - larg / 2, c[1] - alt / 2], [c[0] + larg / 2, c[1] - alt / 2], [c[0] + larg / 2, c[1] + alt / 2], [c[0] - larg / 2, c[1] + alt / 2]];
     }
     const n = s.posizioni.length + 1;
+    const nComp = s.posizioni.filter((x) => x.fissa).length + 1;
     const p = {
-      id: idUnico('posizione-' + n, s.posizioni.map((x) => x.id)),
-      nome: f.forma === 'cerchio' ? 'Cerchio di centrocampo' : 'Posizione ' + n,
+      id: idUnico((competizione ? 'competizione-' : 'posizione-') + n, s.posizioni.map((x) => x.id)),
+      nome: f.forma === 'cerchio' ? 'Cerchio di centrocampo' : competizione ? 'Competizione ' + nComp : 'Posizione ' + n,
       punti: punti.map((q) => [arrot(q[0]), arrot(q[1])]),
       bordo: 0,
     };
+    if (competizione) p.fissa = true;
     s.posizioni.push(p);
     ed.posId = p.id;
-    ed.punto = 0;
+    ed.punto = null;
     segnaModifica();
     aggiornaTutto();
     ricomponi(false);
+    avvisa('Trascina la nuova posizione sulla zona giusta, poi sistema i 4 punti.', 'ok');
+    if (competizione && !(s.varianti && s.varianti.length)) copiaCompetizioni(null, true);
   }
 
   // Cambiando tipologia i punti vengono convertiti (angoli ↔ punti cardinali) mantenendo la stessa superficie.
@@ -890,7 +1024,44 @@
       const b = e.target.closest('button[data-tipo]');
       if (b) cambiaTipo(b.dataset.tipo);
     });
-    $('ed-aggiungi-pos').addEventListener('click', aggiungiPosizione);
+    $('ed-aggiungi-pos').addEventListener('click', () => aggiungiPosizione('logo'));
+    $('ed-aggiungi-comp').addEventListener('click', () => aggiungiPosizione('competizione'));
+    $('ed-copia-comp').addEventListener('change', (e) => {
+      const id = e.target.value;
+      e.target.value = '';
+      if (id) copiaCompetizioni(id, false);
+    });
+    $('ed-spessore').addEventListener('change', (e) => {
+      const s = scena();
+      if (!s) return;
+      if (e.target.checked) {
+        const k = (s.larghezza || (ed.immagine && ed.immagine.naturalWidth) || 1920) / 1920;
+        s.spessore = Object.assign({}, C.SPESSORE_PREDEFINITO, { profondita: Math.max(1, Math.round(C.SPESSORE_PREDEFINITO.profondita * k * 2) / 2) });
+      } else {
+        delete s.spessore;
+      }
+      segnaModifica();
+      aggiornaSpessore();
+      ricomponi(false);
+    });
+    $('ed-spessore-colore').addEventListener('input', (e) => modificaSpessore({ colore: e.target.value }));
+    $('ed-spessore-hex').addEventListener('input', (e) => {
+      let v = e.target.value.trim();
+      if (v && v[0] !== '#') v = '#' + v;
+      if (/^#[0-9a-f]{6}$/i.test(v)) modificaSpessore({ colore: v.toLowerCase() });
+    });
+    $('ed-spessore-hex').addEventListener('blur', aggiornaSpessore);
+    $('ed-spessore-prof').addEventListener('input', (e) => modificaSpessore({ profondita: Number(e.target.value) }));
+    $('ed-spessore-lato').addEventListener('change', (e) => modificaSpessore({ lato: e.target.value }));
+    // Spazio tenuto premuto: trascinando si sposta la vista anche sopra una posizione
+    window.addEventListener('keydown', (e) => {
+      if (e.code === 'Space' && !$('vista-template').hidden && !/^(INPUT|TEXTAREA|SELECT)$/.test(document.activeElement.tagName)) {
+        e.preventDefault();
+        ed.spazio = true;
+        $('ed-palco').classList.remove('sposta', 'maniglia');
+      }
+    });
+    window.addEventListener('keyup', (e) => { if (e.code === 'Space') ed.spazio = false; });
     $('ed-file-variante').addEventListener('change', (e) => { if (e.target.files[0]) aggiungiVariante(e.target.files[0]); e.target.value = ''; });
     $('ed-prova').addEventListener('change', () => ricomponi(false));
     for (const [id, i] of [['ed-punto-x', 0], ['ed-punto-y', 1]]) {

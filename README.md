@@ -53,7 +53,9 @@ Nella scheda **Template**:
 1. *+ Nuovo* e scrivi il nome del cliente (per modificarne uno esistente, sceglilo dal menu).
 2. **Centro campo**: *+ Aggiungi immagine* → foto del centrocampo → tipologia *Centro campo* → *+ Aggiungi posizione*. Porta i 4 punti sulla linea del cerchio: *alto* e *basso* dove la linea di metà campo incrocia il cerchio, *destra* e *sinistra* all'altezza del dischetto. L'ellisse deve combaciare con il cerchio e il mirino cadere sul dischetto.
 3. **Tappeti, Additional, Retroporta ground e vertical**: *+ Aggiungi immagine* → foto → scegli la tipologia → *+ Aggiungi posizione* per ogni area. Porta i 4 angoli sull'area dove andrà la grafica, nell'ordine in cui si legge il logo (alto sx, alto dx, basso dx, basso sx).
-   - **Competizioni** (es. tappeti interni con sponsor diverso tra campionato e coppe): *+ Aggiungi competizione* per ogni grafica (stesso formato della tipologia, es. 900×100), dalle il nome (*Domestico*, *Internazionale*…) e spunta **fissa** sulle posizioni che la usano. Le posizioni fisse non ricevono il logo del brand; in *Crea mockup* compare la scelta della competizione.
+   - Per ogni area usa **+ Posizione logo** (riceve il logo del brand) oppure **+ Posizione competizione** (es. i tappeti interni enilive / 1xbet). La nuova posizione compare al centro della vista: **trascinala dall'interno** fin sulla zona giusta, poi sistema i 4 punti. Il tipo si cambia anche dopo, con *Logo / Competizione* sotto il nome della posizione.
+   - **Competizioni**: la prima *Posizione competizione* copia in automatico le competizioni da un cliente che le ha già (es. Inter: *Domestico* = enilive, *Internazionale* = 1xbet). Si possono anche copiare con *Copia da un cliente…* o aggiungere a mano con *+ Aggiungi grafica* (stesso formato della tipologia, es. 900×100) e rinominare. In *Crea mockup* compare la scelta della competizione.
+   - **Spessore dei tappeti** (solo nel mockup, non nel PNG di produzione): spunta *Aggiungi lo spessore nel mockup* e scegli colore, profondità in pixel e lato. *Automatico* mette lo spessore in alto e sul lato corto più basso (porta a sinistra → a sinistra, porta a destra → a destra). Vale per tutti i tappeti dell'immagine, competizioni comprese.
 4. **Dai un nome chiaro alle posizioni** (es. *Esterno sinistra*): è quello che si vede in *Crea mockup*.
 5. **Bordo (px)**: lascia 0 con foto pulite; metti 0,6–0,7 se nella foto c'è già un vecchio logo da coprire.
 6. **Controlla** con *Mostra artwork di prova*: il motivo deve coprire esattamente la zona e la scritta *ALTO* deve stare dalla parte lontana del campo.
@@ -71,7 +73,7 @@ Nella scheda **Template**:
 3. Controlla con *Mostra artwork di prova* che le aree combacino. Con le foto pulite il **Bordo** delle posizioni può tornare a 0.
 4. Salva nella cartella `templates` e pubblica.
 
-Strumenti utili nell'editor: rotella per lo zoom, trascina lo sfondo per spostarti, frecce per muovere il punto selezionato (⇧ = 10 px, ⌥ = 0,1 px), lente d'ingrandimento durante lo spostamento.
+Strumenti utili nell'editor: rotella per lo zoom; trascina **dentro** una posizione per spostarla tutta, **su un punto** per spostare solo quello; trascina lo sfondo (o tieni premuto *Spazio* e trascina) per spostare la vista; frecce per muovere il punto selezionato, oppure tutta la posizione se non è selezionato un punto (⇧ = 10 px, ⌥ = 0,1 px); lente d'ingrandimento durante lo spostamento dei punti.
 
 ## Password del team
 
