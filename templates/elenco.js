@@ -1,7 +1,23 @@
 /* Elenco dei template di Mockup Studio (nomi cifrati con la password del team) */
 MockupTool.elencoTemplate([
-  {"id":"t-h7wpjmhamy","nome":{"iv":"6tEstP0AFOXNP8hk","ct":"5ZZIlNTVDGldFEhbzIJwljSW+waO2YfUU0yJx4dGk9obnQ=="},"file":"t-h7wpjmhamy.js"},
-  {"id":"t-4iivstazpq","nome":{"iv":"AOSbdwh9ETWAP1gW","ct":"RW3XmcbGAlm8JoEU1e1d1yTSUj/JPmBP"},"file":"t-4iivstazpq.js"},
-  {"id":"t-mg6cgjs2pr","nome":{"iv":"fAVwsse6nS25GY4w","ct":"MRr6mFvRwf+yxqvZJ63/tVwkusM="},"file":"t-mg6cgjs2pr.js"}
+  {"id":"t-5qqxmgkx32","nome":{"iv":"PjAgs4squfgLO3U3","ct":"t2dbhbSFSG7VCv67E5WQtHqpTchd3WQA"},"file":"t-5qqxmgkx32.js"},
+  {"id":"t-azs4e2wmjv","nome":{"iv":"5auagHzFsJxHaHsG","ct":"l/RDt4WXE0heXktdyGm9mDgAqP34qCI="},"file":"t-azs4e2wmjv.js"},
+  {"id":"t-5x39t9ue4z","nome":{"iv":"E4Jp0zxErwinzQLm","ct":"1BJr5Fa2Hxx3aH8uCl956VuQvFsOkiCf"},"file":"t-5x39t9ue4z.js"},
+  {"id":"t-mg6cgjs2pr","nome":{"iv":"Lnk8EVXYsWtsnC1D","ct":"6kAo0S9vlCtDPZWfZPCDK2mLWWs="},"file":"t-mg6cgjs2pr.js"},
+  {"id":"t-vhsjhyr7pq","nome":{"iv":"GvPjoDjdaYJHZinG","ct":"U3I86qMNKua7e7V8aZ+Mv8G2wXpibJUTpxg="},"file":"t-vhsjhyr7pq.js"},
+  {"id":"t-63kw8idj4h","nome":{"iv":"fknB4vXP2pmvhrJJ","ct":"YMmNFW7vxfTwzf+oJVCeuzOUUvHJtskm3w=="},"file":"t-63kw8idj4h.js"},
+  {"id":"t-vwnwm74dkw","nome":{"iv":"FzdpheJrqm0IxcoE","ct":"PPfSaB1ZU+hwLapxQDJnwQKspyGZ"},"file":"t-vwnwm74dkw.js"},
+  {"id":"t-h7wpjmhamy","nome":{"iv":"PseFd6jdmJQkqYIL","ct":"xIPtKnrfDdrnX++NDqkKwfbVOxIL+WG0AO5jdsqLf2fUOg=="},"file":"t-h7wpjmhamy.js"},
+  {"id":"t-4iivstazpq","nome":{"iv":"Fc899D+1DYsMVhks","ct":"serYaKFeFRJSDMUTN5NbBSl/D8NC2Ee9"},"file":"t-4iivstazpq.js"},
+  {"id":"t-29qy42n9xh","nome":{"iv":"J6Bb3vEFlJmxiPcA","ct":"8HeNwtkcNpR4QjPs2krkFoiU5Wtd"},"file":"t-29qy42n9xh.js"},
+  {"id":"t-k68e7m49ri","nome":{"iv":"Z9BlrNnzwkfdXqAl","ct":"6pCcuvCwCHHse2CvRTubwRt0o9p2"},"file":"t-k68e7m49ri.js"},
+  {"id":"t-xya4s39afi","nome":{"iv":"FWYa296OhzgraOax","ct":"Y4pjjRdBjre1UEcUoMIMvYCI/ZCS"},"file":"t-xya4s39afi.js"},
+  {"id":"t-w4c6cugsqf","nome":{"iv":"EQjF+ViAYsOoxo+Z","ct":"VcUKIM7uuvHdZ92CHS6DvU5bQpHA"},"file":"t-w4c6cugsqf.js"},
+  {"id":"t-y4w9kkgm5z","nome":{"iv":"bboCJrghO9dZ3Enw","ct":"jky7V9TlZ+K6SQPbcBooEMtwZUI//w=="},"file":"t-y4w9kkgm5z.js"},
+  {"id":"t-e2p9g3xduw","nome":{"iv":"EuX+ikzUSc3neneg","ct":"znnq5Hlw9Q1ibeTiuUtD+9YBCdIQ"},"file":"t-e2p9g3xduw.js"},
+  {"id":"t-f7fgxx5q4u","nome":{"iv":"7a9cbUj+R2BOYljM","ct":"AB2DxtxrW4KQ5vw0XEb55xNhrQ8="},"file":"t-f7fgxx5q4u.js"},
+  {"id":"t-ksbdink43e","nome":{"iv":"GKGDfEQlX6XNsBEx","ct":"3V4lrHoMNSdnXZZ8xk4UlskqpA0Dcz2k"},"file":"t-ksbdink43e.js"},
+  {"id":"t-kkvvyegrrg","nome":{"iv":"lqdzNIVJTlZ7pxOr","ct":"30Aj9AJZnpUadYp9toawadDQRdK30A=="},"file":"t-kkvvyegrrg.js"},
+  {"id":"t-2e4dhhnies","nome":{"iv":"4SM8LnxLDm++0Xs8","ct":"79HKt9tgmhqSYjrhx85trgqPbaJWIDk="},"file":"t-2e4dhhnies.js"}
 ],
 {"v":1,"iterazioni":600000,"sale":"9vDSY58/Igw8WnSah/IyJA==","controllo":{"iv":"/cGeTEN8EsJhCijT","ct":"aoO7QLCen/iyrcxvMxld7Vne/qrs2sODeg0seTA="}});
