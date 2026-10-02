@@ -86,7 +86,7 @@
   }
 
   function canvasInBlob(canvas, tipo, qualita) {
-    return new Promise((ok, ko) => canvas.toBlob((b) => (b ? ok(b) : ko(new Error('Esportazione non riuscita'))), tipo, qualita));
+    return new Promise((ok, ko) => canvas.toBlob((b) => (b ? ok(b) : ko(new Error('Export failed'))), tipo, qualita));
   }
 
   MK.archivio = { supportato, Cartella, scarica, scaricaTutti, canvasInBlob, leggi, scrivi };

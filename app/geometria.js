@@ -9,7 +9,7 @@
     for (let c = 0; c < n; c++) {
       let p = c;
       for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
-      if (Math.abs(M[p][c]) < 1e-12) throw new Error('Punti degeneri: impossibile calcolare la prospettiva');
+      if (Math.abs(M[p][c]) < 1e-12) throw new Error('Degenerate points: cannot compute the perspective');
       [M[c], M[p]] = [M[p], M[c]];
       for (let r = c + 1; r < n; r++) {
         const f = M[r][c] / M[c][c];
@@ -46,7 +46,7 @@
     const [a, b, c, d, e, f, g, h, i] = H;
     const A = e * i - f * h, B = -(d * i - f * g), C = d * h - e * g;
     const det = a * A + b * B + c * C;
-    if (Math.abs(det) < 1e-15) throw new Error('Trasformazione non invertibile');
+    if (Math.abs(det) < 1e-15) throw new Error('Non-invertible transformation');
     const inv = [
       A, -(b * i - c * h), b * f - c * e,
       B, a * i - c * g, -(a * f - c * d),

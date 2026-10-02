@@ -37,7 +37,7 @@
       // sul web evita la cache; aprendo la pagina da disco (file://) il file viene sempre riletto
       s.src = /^https?:$/.test(location.protocol) ? src + '?t=' + Date.now() : src;
       s.onload = () => { s.remove(); ok(); };
-      s.onerror = () => { s.remove(); ko(new Error('File non trovato: ' + src)); };
+      s.onerror = () => { s.remove(); ko(new Error('File not found: ' + src)); };
       document.head.appendChild(s);
     });
   }
@@ -62,20 +62,20 @@
   async function carica(id) {
     if (registrati[id]) return registrati[id];
     const voce = elenco.find((t) => t.id === id);
-    if (!voce) throw new Error('Template sconosciuto: ' + id);
+    if (!voce) throw new Error('Unknown template: ' + id);
     if (!cifrati[id]) {
       const segnale = new Promise((ok) => { inAttesa[id] = ok; });
       await caricaScript(CARTELLA + voce.file);
       if (!registrati[id] && !cifrati[id]) {
-        await Promise.race([segnale, new Promise((_, ko) => setTimeout(() => ko(new Error('Il file ' + voce.file + ' non contiene il template atteso')), 4000))]);
+        await Promise.race([segnale, new Promise((_, ko) => setTimeout(() => ko(new Error('The file ' + voce.file + ' does not contain the expected template')), 4000))]);
       }
     }
     if (registrati[id]) return registrati[id];
-    if (!sicurezza.chiave) throw new Error('Serve la password del team per aprire questo template');
+    if (!sicurezza.chiave) throw new Error('The team password is needed to open this template');
     try {
       registrati[id] = await MK.cifra.decifraTemplate(sicurezza.chiave, cifrati[id]);
     } catch (e) {
-      throw new Error('Impossibile aprire il template: è cifrato con un\'altra password');
+      throw new Error('Cannot open the template: it is encrypted with a different password');
     }
     delete cifrati[id];
     return registrati[id];
@@ -119,17 +119,17 @@
     const t = testo.trim();
     let m = /registraTemplateCifrato\(([\s\S]*)\);?\s*$/.exec(t);
     if (m) {
-      if (!sicurezza.chiave) throw new Error('Serve la password del team');
+      if (!sicurezza.chiave) throw new Error('The team password is needed');
       try {
         return await MK.cifra.decifraTemplate(sicurezza.chiave, JSON.parse(m[1]));
       } catch (e) {
-        throw new Error('Il file è cifrato con un\'altra password');
+        throw new Error('The file is encrypted with a different password');
       }
     }
     m = /registraTemplate\(([\s\S]*)\);?\s*$/.exec(t);
-    if (!m) throw new Error('Il file non è un template di Mockup Studio');
+    if (!m) throw new Error('The file is not a Mockup Studio template');
     const tpl = JSON.parse(m[1]);
-    if (!tpl.id || !Array.isArray(tpl.scene)) throw new Error('Template incompleto');
+    if (!tpl.id || !Array.isArray(tpl.scene)) throw new Error('Incomplete template');
     return tpl;
   }
 

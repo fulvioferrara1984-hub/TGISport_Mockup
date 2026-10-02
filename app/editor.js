@@ -6,13 +6,13 @@
   const C = MK.composizione, G = MK.geo, T = MK.template, A = MK.archivio;
   const COLORI = ['#4f7cff', '#ff6b4a', '#1fc28b', '#ffb020', '#c455ff', '#21b8d8'];
   const ETICHETTE = {
-    cerchio: ['alto', 'destra', 'basso', 'sinistra'],
-    rettangolo: ['alto sx', 'alto dx', 'basso dx', 'basso sx'],
+    cerchio: ['top', 'right', 'bottom', 'left'],
+    rettangolo: ['top left', 'top right', 'bottom right', 'bottom left'],
   };
   const AIUTO = {
-    CC: 'Porta i 4 punti sulla linea del cerchio di centrocampo: <b>alto</b> e <b>basso</b> dove la linea di metà campo incrocia il cerchio, <b>destra</b> e <b>sinistra</b> all\'altezza del dischetto. L\'ellisse deve combaciare con il cerchio e il mirino deve cadere sul dischetto: così anche la prospettiva del logo sarà corretta.',
-    MATS: 'Porta i 4 angoli sulla faccia del tappeto dove andrà la grafica, nell\'ordine in cui si legge il logo: <b>alto sx, alto dx, basso dx, basso sx</b>. Usa la lente e le frecce della tastiera per la precisione.',
-    rettangolo: 'Porta i 4 angoli sull\'area dove andrà la grafica, nell\'ordine in cui si legge il logo: <b>alto sx, alto dx, basso dx, basso sx</b>. Usa la lente e le frecce della tastiera per la precisione.',
+    CC: 'Move the 4 points onto the centre circle line: <b>top</b> and <b>bottom</b> where the halfway line crosses the circle, <b>right</b> and <b>left</b> level with the centre spot. The ellipse must match the circle and the crosshair must sit on the centre spot: that way the logo perspective will be right too.',
+    MATS: 'Move the 4 corners onto the face of the mat where the artwork goes, in the order the logo reads: <b>top left, top right, bottom right, bottom left</b>. Use the magnifier and the arrow keys for precision.',
+    rettangolo: 'Move the 4 corners onto the area where the artwork goes, in the order the logo reads: <b>top left, top right, bottom right, bottom left</b>. Use the magnifier and the arrow keys for precision.',
   };
 
   const ed = {
@@ -70,14 +70,14 @@
     }
     if (ed.template && !T.elenco.some((v) => v.id === ed.template.id)) {
       const o = document.createElement('option');
-      o.value = ''; o.textContent = (ed.template.nome || 'Nuovo template') + ' (non salvato)';
+      o.value = ''; o.textContent = (ed.template.nome || 'New template') + ' (not saved)';
       sel.appendChild(o);
     }
     sel.value = ed.template && T.elenco.some((v) => v.id === ed.template.id) ? ed.template.id : '';
   }
 
   function conferma(testo) {
-    return !ed.modificato || window.confirm(testo || 'Ci sono modifiche non salvate a questo template. Vuoi abbandonarle?');
+    return !ed.modificato || window.confirm(testo || 'This template has unsaved changes. Discard them?');
   }
 
   function apri(t, modificato) {
@@ -100,7 +100,7 @@
       try {
         ed.immagine = await T.immagineScena(s);
       } catch (e) {
-        avvisa('Immagine non leggibile: ' + e.message, 'errore');
+        avvisa('Could not read the image: ' + e.message, 'errore');
       }
     }
     aggiornaTutto();
@@ -130,7 +130,7 @@
     aggiornaNotaSalva();
     aggiornaNotaPassword();
     $('ed-messaggio').hidden = !!ed.immagine;
-    $('ed-messaggio').textContent = !t ? 'Scegli un template o creane uno nuovo.' : 'Aggiungi un\'immagine di base (JPG o PNG) per iniziare.';
+    $('ed-messaggio').textContent = !t ? 'Choose a template or create a new one.' : 'Add a base image (JPG or PNG) to get started.';
   }
 
   function nomeFile() {
@@ -138,7 +138,7 @@
     const voce = T.elenco.find((v) => v.id === t.id);
     if (voce) return voce.file;
     if (t.id) return t.id + '.js';
-    return T.protezione() ? 'nome neutro, assegnato al salvataggio' : T.slug(t.nome) + '.js';
+    return T.protezione() ? 'neutral name, assigned when saving' : T.slug(t.nome) + '.js';
   }
 
   function riempiScene() {
@@ -148,16 +148,16 @@
     for (const s of ed.template.scene) {
       const el = document.createElement('div');
       el.className = 'voce' + (s.id === ed.scenaId ? ' attiva' : '');
-      el.innerHTML = '<img alt=""><span class="testo"><b></b><small></small></span><button type="button" class="icona" title="Elimina immagine" aria-label="Elimina immagine"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>';
+      el.innerHTML = '<img alt=""><span class="testo"><b></b><small></small></span><button type="button" class="icona" title="Delete image" aria-label="Delete image"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>';
       el.querySelector('img').src = s.immagine;
       el.querySelector('b').textContent = s.nome;
-      el.querySelector('small').textContent = MK.TIPI[s.tipo].nome + ' · ' + s.posizioni.length + (s.posizioni.length === 1 ? ' posizione' : ' posizioni');
+      el.querySelector('small').textContent = MK.TIPI[s.tipo].nome + ' · ' + s.posizioni.length + (s.posizioni.length === 1 ? ' position' : ' positions');
       el.addEventListener('click', (e) => {
         if (e.target.closest('button')) return;
         if (s.id !== ed.scenaId) { ed.scenaId = s.id; ed.posId = null; caricaScena(); }
       });
       el.querySelector('button').addEventListener('click', () => {
-        if (!window.confirm('Eliminare l\'immagine «' + s.nome + '» e le sue posizioni?')) return;
+        if (!window.confirm('Delete the image “' + s.nome + '” and its positions?')) return;
         ed.template.scene = ed.template.scene.filter((x) => x !== s);
         if (ed.scenaId === s.id) ed.scenaId = ed.template.scene.length ? ed.template.scene[0].id : null;
         segnaModifica();
@@ -175,14 +175,14 @@
     s.posizioni.forEach((p, i) => {
       const el = document.createElement('div');
       el.className = 'voce posizione-ed' + (p.id === ed.posId ? ' attiva' : '');
-      el.innerHTML = '<div class="riga"><span class="pallino"></span><input type="text" aria-label="Nome posizione"><button type="button" class="icona" title="Elimina posizione" aria-label="Elimina posizione"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>' +
-        '<div class="riga dettagli"><div class="ruolo" role="radiogroup" aria-label="Contenuto della posizione"><button type="button" role="radio" data-ruolo="logo" title="Riceve il logo del brand">Logo</button><button type="button" role="radio" data-ruolo="competizione" title="Mostra la grafica della competizione scelta (es. enilive / 1xbet)">Competizione</button></div>' +
-        '<label class="bordo" title="Allarga la grafica oltre i punti (in pixel) per coprire residui di un vecchio logo nella foto">Bordo <input type="number" min="0" max="5" step="0.1" aria-label="Bordo in pixel"> px</label></div>';
+      el.innerHTML = '<div class="riga"><span class="pallino"></span><input type="text" aria-label="Position name"><button type="button" class="icona" title="Delete position" aria-label="Delete position"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>' +
+        '<div class="riga dettagli"><div class="ruolo" role="radiogroup" aria-label="Position content"><button type="button" role="radio" data-ruolo="logo" title="Receives the brand logo">Logo</button><button type="button" role="radio" data-ruolo="competizione" title="Shows the artwork of the chosen competition (e.g. enilive / 1xbet)">Competition</button></div>' +
+        '<label class="bordo" title="Extends the artwork beyond the points (in pixels) to cover traces of an old logo in the photo">Bleed <input type="number" min="0" max="5" step="0.1" aria-label="Bleed in pixels"> px</label></div>';
       el.querySelector('.pallino').style.background = COLORI[i % COLORI.length];
       const nome = el.querySelector('input[type=text]');
       nome.value = p.nome;
       nome.addEventListener('input', () => { p.nome = nome.value; segnaModifica(); });
-      nome.addEventListener('change', () => { if (!p.nome.trim()) { p.nome = 'Posizione ' + (i + 1); nome.value = p.nome; } });
+      nome.addEventListener('change', () => { if (!p.nome.trim()) { p.nome = 'Position ' + (i + 1); nome.value = p.nome; } });
       const ruolo = el.querySelector('.ruolo');
       ruolo.hidden = !rettangolo;
       ruolo.querySelectorAll('button').forEach((b) => b.setAttribute('aria-checked', String((b.dataset.ruolo === 'competizione') === !!p.fissa)));
@@ -219,7 +219,7 @@
     if (!s.posizioni.length) {
       const n = document.createElement('p');
       n.className = 'nota';
-      n.textContent = 'Nessuna posizione: aggiungine una, trascinala sulla zona giusta e poi sistema i punti.';
+      n.textContent = 'No positions yet: add one, drag it onto the right area, then adjust the points.';
       box.appendChild(n);
     }
   }
@@ -231,12 +231,12 @@
     for (const v of s.varianti || []) {
       const el = document.createElement('div');
       el.className = 'voce variante';
-      el.innerHTML = '<img alt=""><input type="text" aria-label="Nome della competizione"><button type="button" class="icona" title="Elimina competizione" aria-label="Elimina competizione"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>';
+      el.innerHTML = '<img alt=""><input type="text" aria-label="Competition name"><button type="button" class="icona" title="Delete competition" aria-label="Delete competition"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>';
       el.querySelector('img').src = v.artwork;
       const nome = el.querySelector('input');
       nome.value = v.nome;
       nome.addEventListener('input', () => { v.nome = nome.value; segnaModifica(); });
-      nome.addEventListener('change', () => { if (!v.nome.trim()) { v.nome = 'Competizione'; nome.value = v.nome; } });
+      nome.addEventListener('change', () => { if (!v.nome.trim()) { v.nome = 'Competition'; nome.value = v.nome; } });
       el.querySelector('button').addEventListener('click', () => {
         s.varianti = s.varianti.filter((x) => x !== v);
         if (!s.varianti.length) delete s.varianti;
@@ -251,7 +251,7 @@
   async function aggiungiVariante(file) {
     const s = scena();
     if (!s) return;
-    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return avvisa('Usa un\'immagine JPG o PNG per la grafica della competizione.', 'errore');
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return avvisa('Use a JPG or PNG image for the competition artwork.', 'errore');
     try {
       const url = await MK.loghi.leggiComeDataURL(file);
       const img = await MK.loghi.caricaImmagine(url);
@@ -263,8 +263,8 @@
       aggiornaTutto();
       ricomponi(false);
       const w = img.naturalWidth, h = img.naturalHeight;
-      if (Math.abs(w / h - f.w / f.h) > 0.02 * (f.w / f.h)) avvisa('La grafica è ' + w + '×' + h + ': ha proporzioni diverse dal formato ' + f.w + '×' + f.h + ' e verrà adattata.', 'errore');
-      else avvisa('Competizione aggiunta: dalle il nome (es. «Domestico») e segna come fisse le posizioni che la usano.', 'ok');
+      if (Math.abs(w / h - f.w / f.h) > 0.02 * (f.w / f.h)) avvisa('The artwork is ' + w + '×' + h + ': its proportions differ from the ' + f.w + '×' + f.h + ' format, so it will be stretched to fit.', 'errore');
+      else avvisa('Competition added: give it a name and set the positions that use it to Competition.', 'ok');
     } catch (e) {
       avvisa(e.message, 'errore');
     }
@@ -287,7 +287,7 @@
   async function riempiCopiaCompetizioni() {
     const sel = $('ed-copia-comp');
     const fonti = await fontiCompetizioni();
-    sel.innerHTML = '<option value="">Copia da un cliente…</option>';
+    sel.innerHTML = '<option value="">Copy from a client…</option>';
     for (const f of fonti) {
       const o = document.createElement('option');
       o.value = f.id;
@@ -295,7 +295,7 @@
       sel.appendChild(o);
     }
     sel.disabled = !fonti.length;
-    sel.title = fonti.length ? '' : 'Nessun altro cliente ha competizioni da copiare';
+    sel.title = fonti.length ? '' : 'No other client has competitions to copy';
   }
 
   // Copia le competizioni di un altro cliente nell'immagine selezionata (automatico = prima fonte disponibile).
@@ -305,15 +305,15 @@
     const fonti = await fontiCompetizioni();
     const fonte = idFonte ? fonti.find((f) => f.id === idFonte) : fonti[0];
     if (!fonte) {
-      if (automatico) avvisa('Aggiungi qui sotto le grafiche delle competizioni (es. enilive per Domestico, 1xbet per Internazionale).', 'ok');
+      if (automatico) avvisa('Add the competition artwork below (e.g. enilive for domestic matches, 1xbet for international ones).', 'ok');
       return;
     }
-    if (s.varianti && s.varianti.length && !window.confirm('Sostituire le competizioni di questa immagine con quelle di «' + fonte.nome + '»?')) return;
+    if (s.varianti && s.varianti.length && !window.confirm('Replace the competitions of this image with those of “' + fonte.nome + '”?')) return;
     s.varianti = JSON.parse(JSON.stringify(fonte.varianti));
     segnaModifica();
     aggiornaTutto();
     ricomponi(false);
-    avvisa('Competizioni copiate da «' + fonte.nome + '»: ' + s.varianti.map((v) => v.nome).join(', ') + '.', 'ok');
+    avvisa('Competitions copied from “' + fonte.nome + '”: ' + s.varianti.map((v) => v.nome).join(', ') + '.', 'ok');
   }
 
   // Nell'anteprima dell'editor le posizioni fisse mostrano la grafica della prima competizione.
@@ -333,7 +333,7 @@
     $('ed-blocco-spessore').hidden = !rettangolo;
     $('ed-blocco-competizioni').hidden = !rettangolo;
     $('ed-aggiungi-comp').hidden = !rettangolo;
-    $('ed-aggiungi-pos').textContent = rettangolo ? '+ Posizione logo' : '+ Aggiungi posizione';
+    $('ed-aggiungi-pos').textContent = rettangolo ? '+ Logo position' : '+ Add position';
     if (!rettangolo) return;
     const sp = s.spessore;
     $('ed-spessore').checked = !!sp;
@@ -342,7 +342,7 @@
     $('ed-spessore-colore').value = sp.colore;
     if (document.activeElement !== $('ed-spessore-hex')) $('ed-spessore-hex').value = sp.colore.toUpperCase();
     $('ed-spessore-prof').value = sp.profondita;
-    $('ed-spessore-out').textContent = String(sp.profondita).replace('.', ',') + ' px';
+    $('ed-spessore-out').textContent = String(sp.profondita) + ' px';
     $('ed-spessore-lato').value = sp.lato || 'auto';
   }
 
@@ -379,11 +379,11 @@
   function aggiornaNotaSalva() {
     const nota = $('ed-nota-salva');
     if (!ed.template) { nota.textContent = ''; return; }
-    const stato = ed.modificato ? '<b>Modifiche non salvate.</b> ' : '';
-    const cifrati = T.protezione() ? ', cifrati con la password del team' : '';
+    const stato = ed.modificato ? '<b>Unsaved changes.</b> ' : '';
+    const cifrati = T.protezione() ? ', encrypted with the team password' : '';
     nota.innerHTML = stato + (A.supportato
-      ? 'Scegli la cartella <code>templates</code> di Mockup Studio: verranno scritti <code>' + esc(nomeFile()) + '</code> ed <code>elenco.js</code>' + cifrati + '.'
-      : 'Verranno scaricati <code>' + esc(nomeFile()) + '</code> ed <code>elenco.js</code>' + cifrati + ': spostali nella cartella <code>templates</code> (sostituendo il vecchio elenco).');
+      ? 'Choose the Mockup Studio <code>templates</code> folder: <code>' + esc(nomeFile()) + '</code> and <code>elenco.js</code> will be written there' + cifrati + '.'
+      : '<code>' + esc(nomeFile()) + '</code> and <code>elenco.js</code> will be downloaded' + cifrati + ': move them into the <code>templates</code> folder (replacing the old list).');
     $('ed-salva').hidden = !A.supportato;
     $('ed-salva').disabled = !ed.template;
     $('ed-scarica').disabled = !ed.template;
@@ -698,13 +698,13 @@
 
   function nuovoTemplate() {
     if (!conferma()) return;
-    apri({ id: '', nome: 'Nuovo cliente', scene: [] }, true);
+    apri({ id: '', nome: 'New client', scene: [] }, true);
     $('ed-nome').focus();
     $('ed-nome').select();
   }
 
   function mb(byte) {
-    return (byte / 1048576).toFixed(1).replace('.', ',') + ' MB';
+    return (byte / 1048576).toFixed(1) + ' MB';
   }
 
   function haTrasparenze(c) {
@@ -716,7 +716,7 @@
   // Legge una foto di base. PNG e WebP senza trasparenze diventano JPG di alta qualità: i template
   // restano leggeri (si scaricano ogni volta che un collega apre il cliente) e il mockup non cambia.
   async function leggiFoto(file) {
-    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error('Usa un\'immagine JPG o PNG come foto di base.');
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) throw new Error('Use a JPG or PNG image as the base photo.');
     let url = await MK.loghi.leggiComeDataURL(file);
     let img = await MK.loghi.caricaImmagine(url);
     let nota = '';
@@ -728,7 +728,7 @@
         if (jpg.size < file.size) {
           url = await MK.loghi.leggiComeDataURL(jpg);
           img = await MK.loghi.caricaImmagine(url);
-          nota = ' Salvata come JPG di alta qualità (' + mb(file.size) + ' → ' + mb(jpg.size) + ').';
+          nota = ' Saved as a high-quality JPG (' + mb(file.size) + ' → ' + mb(jpg.size) + ').';
         }
       }
     }
@@ -756,7 +756,7 @@
       ed.posId = null;
       segnaModifica();
       await caricaScena();
-      avvisa('Immagine aggiunta: scegli la tipologia e aggiungi le posizioni.' + nota, 'ok');
+      avvisa('Image added: choose its type and add the positions.' + nota, 'ok');
     } catch (e) {
       avvisa(e.message, 'errore');
     }
@@ -771,17 +771,18 @@
       const w = img.naturalWidth, h = img.naturalHeight;
       const vw = s.larghezza || (ed.immagine && ed.immagine.naturalWidth) || w;
       const vh = s.altezza || (ed.immagine && ed.immagine.naturalHeight) || h;
-      let avviso = '';
+      let avviso = '', daRicontrollare = false;
       if (w !== vw || h !== vh) {
         if (Math.abs(w / h - vw / vh) < 0.005) {
           // stessa inquadratura a un'altra risoluzione: i punti vengono riportati in scala
           const k = w / vw;
           for (const p of s.posizioni) p.punti = p.punti.map(([x, y]) => [arrot(x * k), arrot(y * k)]);
           if (s.spessore) s.spessore.profondita = Math.round(s.spessore.profondita * k * 2) / 2;
-          avviso = ' Posizioni riportate alla nuova misura (' + w + '×' + h + ').';
+          avviso = ' Positions rescaled to the new size (' + w + '×' + h + ').';
         } else {
-          if (!window.confirm('La nuova foto è ' + w + '×' + h + ', la precedente ' + vw + '×' + vh + ': le proporzioni sono diverse, quindi le posizioni andranno ricontrollate una per una.\nSostituire comunque?')) return;
-          avviso = ' Proporzioni diverse dalla foto precedente: ricontrolla le posizioni.';
+          if (!window.confirm('The new photo is ' + w + '×' + h + ', the previous one ' + vw + '×' + vh + ': the proportions differ, so every position will need checking again.\nReplace anyway?')) return;
+          avviso = ' The proportions differ from the previous photo: check the positions again.';
+          daRicontrollare = true;
         }
       }
       s.immagine = url;
@@ -789,7 +790,7 @@
       s.altezza = h;
       segnaModifica();
       await caricaScena();
-      avvisa('Foto sostituita: controlla che le posizioni combacino, poi salva.' + avviso + nota, avviso.includes('ricontrolla') ? 'errore' : 'ok');
+      avvisa('Photo replaced: check that the positions line up, then save.' + avviso + nota, daRicontrollare ? 'errore' : 'ok');
     } catch (e) {
       avvisa(e.message, 'errore');
     }
@@ -816,7 +817,7 @@
     const nComp = s.posizioni.filter((x) => x.fissa).length + 1;
     const p = {
       id: idUnico((competizione ? 'competizione-' : 'posizione-') + n, s.posizioni.map((x) => x.id)),
-      nome: f.forma === 'cerchio' ? 'Cerchio di centrocampo' : competizione ? 'Competizione ' + nComp : 'Posizione ' + n,
+      nome: f.forma === 'cerchio' ? 'Centre circle' : competizione ? 'Competition ' + nComp : 'Position ' + n,
       punti: punti.map((q) => [arrot(q[0]), arrot(q[1])]),
       bordo: 0,
     };
@@ -827,7 +828,7 @@
     segnaModifica();
     aggiornaTutto();
     ricomponi(false);
-    avvisa('Trascina la nuova posizione sulla zona giusta, poi sistema i 4 punti.', 'ok');
+    avvisa('Drag the new position onto the right area, then adjust the 4 points.', 'ok');
     if (competizione && !(s.varianti && s.varianti.length)) copiaCompetizioni(null, true);
   }
 
@@ -852,10 +853,10 @@
     const t = ed.template;
     if (!t) return false;
     t.nome = (t.nome || '').trim();
-    if (!t.nome) { avvisa('Dai un nome al template (di solito il nome del cliente).', 'errore'); $('ed-nome').focus(); return false; }
-    if (!t.scene.length) { avvisa('Aggiungi almeno un\'immagine di base.', 'errore'); return false; }
+    if (!t.nome) { avvisa('Give the template a name (usually the client name).', 'errore'); $('ed-nome').focus(); return false; }
+    if (!t.scene.length) { avvisa('Add at least one base image.', 'errore'); return false; }
     const vuote = t.scene.filter((s) => !s.posizioni.length).map((s) => s.nome);
-    if (vuote.length && !window.confirm('Queste immagini non hanno posizioni: ' + vuote.join(', ') + '.\nSalvare comunque?')) return false;
+    if (vuote.length && !window.confirm('These images have no positions: ' + vuote.join(', ') + '.\nSave anyway?')) return false;
     if (!t.id) t.id = T.nuovoId(t.nome);
     return true;
   }
@@ -878,10 +879,10 @@
       await cartellaTemplate.scegli();
       ok = await cartellaTemplate.permesso();
     }
-    if (!ok) throw new Error('accesso alla cartella non concesso');
-    if (!(await cartellaTemplate.esiste('elenco.js')) && !window.confirm('La cartella «' + cartellaTemplate.handle.name + '» non contiene elenco.js.\nÈ davvero la cartella "templates" di Mockup Studio?')) {
+    if (!ok) throw new Error('folder access not granted');
+    if (!(await cartellaTemplate.esiste('elenco.js')) && !window.confirm('The folder “' + cartellaTemplate.handle.name + '” does not contain elenco.js.\nIs it really the Mockup Studio “templates” folder?')) {
       cartellaTemplate.handle = null;
-      const annullato = new Error('annullato');
+      const annullato = new Error('cancelled');
       annullato.name = 'AbortError';
       throw annullato;
     }
@@ -907,9 +908,9 @@
       await ottieniCartellaTemplate();
       const files = await preparaFile();
       await salvaFiles(files);
-      await dopoSalvataggio('Template salvato in «' + cartellaTemplate.handle.name + '»: ' + files.map((f) => f.nome).join(' e '));
+      await dopoSalvataggio('Template saved to “' + cartellaTemplate.handle.name + '”: ' + files.map((f) => f.nome).join(' and '));
     } catch (e) {
-      if (e.name !== 'AbortError') avvisa('Salvataggio non riuscito: ' + e.message, 'errore');
+      if (e.name !== 'AbortError') avvisa('Save failed: ' + e.message, 'errore');
     }
   }
 
@@ -917,7 +918,7 @@
     if (!validaPerSalvare()) return;
     const files = await preparaFile();
     await A.scaricaTutti(files);
-    await dopoSalvataggio('Scaricati ' + files.map((f) => f.nome).join(' e ') + ': spostali nella cartella templates (sostituendo elenco.js).');
+    await dopoSalvataggio('Downloaded ' + files.map((f) => f.nome).join(' and ') + ': move them into the templates folder (replacing elenco.js).');
   }
 
   async function importa(file) {
@@ -926,10 +927,10 @@
       if (!conferma()) return;
       T.registraInMemoria(t);
       apri(clona(t), true);
-      avvisa('Template «' + t.nome + '» importato: salvalo nella cartella templates per ritrovarlo alla prossima apertura.', 'ok');
+      avvisa('Template “' + t.nome + '” imported: save it to the templates folder to keep it for next time.', 'ok');
       await MK.app.templateAggiornato(t.id);
     } catch (e) {
-      avvisa('Import non riuscito: ' + e.message, 'errore');
+      avvisa('Import failed: ' + e.message, 'errore');
     }
   }
 
@@ -937,24 +938,24 @@
   function aggiornaNotaPassword() {
     const protetta = !!T.protezione();
     $('ed-nota-password').innerHTML = protetta
-      ? 'I template sono cifrati: senza la password nessuno può vedere le foto dei clienti. Cambiandola vengono ricifrati tutti; poi pubblicali su GitHub e comunica la nuova password ai colleghi.'
-      : 'Nessuna password: i template sono in chiaro. Impostane una prima di pubblicare la piattaforma su un sito pubblico.';
-    $('ed-cambia-password').textContent = protetta ? 'Cambia password' : 'Imposta la password';
+      ? 'Templates are encrypted: without the password nobody can see the client photos. Changing it re-encrypts all of them; then publish them on GitHub and give the new password to your colleagues.'
+      : 'No password: templates are not encrypted. Set one before publishing the platform on a public site.';
+    $('ed-cambia-password').textContent = protetta ? 'Change password' : 'Set password';
   }
 
   async function cambiaPassword(e) {
     e.preventDefault();
     const nuova = $('ed-nuova-password').value, ripeti = $('ed-conferma-password').value;
-    if (nuova.length < 8) return avvisa('La password deve avere almeno 8 caratteri.', 'errore');
-    if (nuova !== ripeti) return avvisa('Le due password non coincidono.', 'errore');
-    if (ed.modificato && !window.confirm('Le modifiche non salvate al template aperto non verranno incluse. Continuare?')) return;
+    if (nuova.length < 8) return avvisa('The password must be at least 8 characters long.', 'errore');
+    if (nuova !== ripeti) return avvisa('The two passwords do not match.', 'errore');
+    if (ed.modificato && !window.confirm('Unsaved changes to the open template will not be included. Continue?')) return;
     const bottone = $('ed-cambia-password');
     const vecchia = { protezione: T.protezione(), chiave: T.chiave() };
     bottone.disabled = true;
     try {
       const inCartella = A.supportato;
       if (inCartella) await ottieniCartellaTemplate();
-      bottone.textContent = 'Cifratura in corso…';
+      bottone.textContent = 'Encrypting…';
       const tutti = [];
       for (const v of T.elenco) tutti.push(await T.carica(v.id));
       const nuovaProt = await MK.cifra.nuovaProtezione(nuova);
@@ -973,11 +974,11 @@
       $('btn-esci').hidden = false;
       aggiornaNotaSalva();
       avvisa(inCartella
-        ? 'Password impostata e template ricifrati. Ora pubblicali su GitHub e comunica la nuova password al team.'
-        : 'Password impostata: sposta i file scaricati nella cartella templates, pubblicali su GitHub e comunica la nuova password al team.', 'ok');
+        ? 'Password set and templates re-encrypted. Now publish them on GitHub and give the new password to the team.'
+        : 'Password set: move the downloaded files into the templates folder, publish them on GitHub and give the new password to the team.', 'ok');
     } catch (err) {
       T.impostaProtezione(vecchia.protezione, vecchia.chiave);
-      if (err.name !== 'AbortError') avvisa('Cambio password non riuscito: ' + err.message, 'errore');
+      if (err.name !== 'AbortError') avvisa('Password change failed: ' + err.message, 'errore');
     } finally {
       bottone.disabled = false;
       aggiornaNotaPassword();

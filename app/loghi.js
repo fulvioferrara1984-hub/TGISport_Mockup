@@ -22,7 +22,7 @@
       s.src = src;
       if (integrity) { s.integrity = integrity; s.crossOrigin = 'anonymous'; }
       s.onload = () => ok();
-      s.onerror = () => ko(new Error('Impossibile caricare ' + src));
+      s.onerror = () => ko(new Error('Could not load ' + src));
       document.head.appendChild(s);
     });
   }
@@ -38,7 +38,7 @@
         return window.pdfjsLib;
       })().catch((e) => {
         pdfjsPromessa = null;
-        throw new Error('Per leggere file .ai/.pdf serve la connessione a internet (libreria pdf.js). ' + e.message);
+        throw new Error('Reading .ai/.pdf files requires an internet connection (pdf.js library). ' + e.message);
       });
     }
     return pdfjsPromessa;
@@ -48,7 +48,7 @@
     return new Promise((ok, ko) => {
       const img = new Image();
       img.onload = () => ok(img);
-      img.onerror = () => ko(new Error('Immagine non leggibile'));
+      img.onerror = () => ko(new Error('Could not read the image'));
       img.src = url;
     });
   }
@@ -117,7 +117,7 @@
     const doc = new DOMParser().parseFromString(testo, 'image/svg+xml');
     const svg = doc.documentElement;
     if (!svg || svg.nodeName.toLowerCase() !== 'svg' || doc.getElementsByTagName('parsererror').length) {
-      throw new Error('Il file SVG non è valido');
+      throw new Error('The SVG file is not valid');
     }
     const num = (v) => (v && !/%$/.test(v.trim()) ? parseFloat(v) : NaN);
     let w = num(svg.getAttribute('width')), h = num(svg.getAttribute('height'));
@@ -152,16 +152,16 @@
     try {
       const testo = (await pagina.getTextContent()).items.map((i) => i.str).join(' ');
       if (/without PDF Content|senza contenuto PDF/i.test(testo)) {
-        throw new Error('Questo file .ai è stato salvato senza "Crea file compatibile PDF": in Illustrator risalvalo con quell\'opzione attiva, oppure esportalo in PDF/SVG/PNG.');
+        throw new Error('This .ai file was saved without "Create PDF Compatible File": re-save it in Illustrator with that option on, or export it as PDF, SVG or PNG.');
       }
     } catch (e) {
-      if (/compatibile PDF/.test(e.message)) throw e;
+      if (/PDF Compatible File/.test(e.message)) throw e;
     }
     const vp1 = pagina.getViewport({ scale: 1 });
     const s1 = 1200 / Math.max(vp1.width, vp1.height);
     const bassa = await renderPdfViewport(pagina, pagina.getViewport({ scale: s1 }));
     const box = riquadroVisibile(bassa, 0);
-    if (!box) throw new Error('La pagina ' + n + ' del file è vuota');
+    if (!box) throw new Error('Page ' + n + ' of the file is empty');
     const bw = (box.w + 2) / s1, bh = (box.h + 2) / s1; // in punti PDF, con 1px di margine
     let s2 = LATO_VETTORIALE / Math.max(bw, bh);
     s2 = Math.min(s2, Math.sqrt(24e6 / (bw * bh)));
@@ -181,7 +181,7 @@
     try {
       pdf = await pdfjs.getDocument({ data: new Uint8Array(bytes.slice(0)), isEvalSupported: false }).promise;
     } catch (e) {
-      throw new Error('Impossibile leggere il file: se è un .ai, risalvalo da Illustrator con "Crea file compatibile PDF" attivo (oppure esportalo in PDF/SVG/PNG).');
+      throw new Error('Could not read the file: if it is an .ai file, re-save it in Illustrator with "Create PDF Compatible File" on (or export it as PDF, SVG or PNG).');
     }
     const r = await renderPaginaPdf(pdf, 1);
     return Object.assign(r, { pdf, pagine: pdf.numPages });
@@ -199,11 +199,11 @@
     } else if (/^(png|jpe?g|webp|gif|bmp|avif)$/.test(ext) || /^image\/(png|jpeg|webp|gif|bmp|avif)$/.test(file.type)) {
       r = await daRaster(file);
     } else if (ext === 'eps' || ext === 'ps') {
-      throw new Error('Il formato EPS non è leggibile dal browser: esporta il logo in PDF, SVG o PNG (oppure .ai compatibile PDF).');
+      throw new Error('Browsers cannot read EPS files: export the logo as PDF, SVG or PNG (or as a PDF-compatible .ai).');
     } else if (ext === 'psd' || ext === 'tif' || ext === 'tiff') {
-      throw new Error('Formato .' + ext + ' non supportato: esporta il logo in PNG (con trasparenza) o PDF.');
+      throw new Error('.' + ext + ' files are not supported: export the logo as PNG (with transparency) or PDF.');
     } else {
-      throw new Error('Formato non riconosciuto (.' + (ext || '?') + '). Usa .ai, .pdf, .svg, .png o .jpg.');
+      throw new Error('Unrecognised format (.' + (ext || '?') + '). Use .ai, .pdf, .svg, .png or .jpg.');
     }
     return {
       nome: file.name,

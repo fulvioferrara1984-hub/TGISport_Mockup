@@ -77,7 +77,7 @@
     const immagini = [];
     const cifraImmagine = async (url, descrizione) => {
       const m = /^data:([^;,]+)?(;base64)?,(.*)$/s.exec(url || '');
-      if (!m || !m[2]) throw new Error('Immagine «' + descrizione + '» non leggibile');
+      if (!m || !m[2]) throw new Error('Could not read the image “' + descrizione + '”');
       immagini.push(await cifra(chiave, daBase64(m[3])));
       return { indice: immagini.length - 1, tipo: m[1] || 'image/jpeg' };
     };

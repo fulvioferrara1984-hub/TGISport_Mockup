@@ -27,12 +27,12 @@
         e.preventDefault();
         if (!campo.value) return;
         bottone.disabled = true;
-        bottone.textContent = 'Verifica…';
+        bottone.textContent = 'Checking…';
         errore.hidden = true;
         try {
           const chiave = await MK.cifra.derivaChiave(campo.value, protezione.sale, protezione.iterazioni);
           if (!(await MK.cifra.chiaveValida(chiave, protezione))) {
-            errore.textContent = 'Password non corretta.';
+            errore.textContent = 'Wrong password.';
             errore.hidden = false;
             campo.select();
             return;
@@ -43,11 +43,11 @@
           box.hidden = true;
           fatto(chiave);
         } catch (err) {
-          errore.textContent = 'Accesso non riuscito: ' + err.message;
+          errore.textContent = 'Sign-in failed: ' + err.message;
           errore.hidden = false;
         } finally {
           bottone.disabled = false;
-          bottone.textContent = 'Entra';
+          bottone.textContent = 'Sign in';
         }
       };
       form.addEventListener('submit', invio);
@@ -62,7 +62,7 @@
     $('btn-esci').hidden = false;
     if (!MK.cifra.disponibile()) {
       box.classList.remove('in-attesa');
-      $('accesso-form').innerHTML = '<p class="errore">Questo browser non permette di aprire i template protetti. Usa Google Chrome aggiornato.</p>';
+      $('accesso-form').innerHTML = '<p class="errore">This browser cannot open the protected templates. Please use an up-to-date version of Google Chrome.</p>';
       return new Promise(() => {});
     }
     let chiave = null;

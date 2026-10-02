@@ -7,15 +7,15 @@
   // Tipologie di mockup e formati di produzione (la sigla finisce nel nome dei file: Brand_<sigla>.png/.jpg).
   // Aggiungere una tipologia qui basta per averla in tutta la piattaforma; una scena può sovrascrivere w/h con `formato`.
   MK.TIPI = {
-    CC: { sigla: 'CC', nome: 'Centro campo', forma: 'cerchio', w: 500, h: 500, dimensione: 0.8 },
-    MATS: { sigla: 'MATS', nome: 'Tappeti', forma: 'rettangolo', w: 900, h: 100, dimensione: 0.7 },
+    CC: { sigla: 'CC', nome: 'Centre circle', forma: 'cerchio', w: 500, h: 500, dimensione: 0.8 },
+    MATS: { sigla: 'MATS', nome: 'Mats', forma: 'rettangolo', w: 900, h: 100, dimensione: 0.7 },
     ADDITIONAL: { sigla: 'Additional', nome: 'Additional', forma: 'rettangolo', w: 248, h: 100, dimensione: 0.7 },
-    RETROPORTA_GROUND: { sigla: 'Retroporta_ground', nome: 'Retroporta ground', forma: 'rettangolo', w: 700, h: 200, dimensione: 0.7 },
-    RETROPORTA_VERTICAL: { sigla: 'Retroporta_vertical', nome: 'Retroporta vertical', forma: 'rettangolo', w: 480, h: 181, dimensione: 0.7 },
+    RETROPORTA_GROUND: { sigla: 'Retroporta_ground', nome: 'Behind goal ground', forma: 'rettangolo', w: 700, h: 200, dimensione: 0.7 },
+    RETROPORTA_VERTICAL: { sigla: 'Retroporta_vertical', nome: 'Behind goal vertical', forma: 'rettangolo', w: 480, h: 181, dimensione: 0.7 },
   };
 
   function descrizioneFormato(t) {
-    return t.forma === 'cerchio' ? 'cerchio ' + t.w + ' px' : t.w + ' × ' + t.h + ' px';
+    return t.forma === 'cerchio' ? t.w + ' px circle' : t.w + ' × ' + t.h + ' px';
   }
 
   function formatoScena(scena) {
@@ -86,14 +86,14 @@
       x.fillStyle = '#111';
       x.font = 'bold ' + Math.round(H * 0.1) + 'px system-ui, sans-serif';
       x.textAlign = 'center'; x.textBaseline = 'middle';
-      x.fillText('ALTO', W / 2, H * 0.12);
+      x.fillText('TOP', W / 2, H * 0.12);
       mascheraCerchio(c);
     } else {
       const g = x.createLinearGradient(0, 0, W, 0);
       g.addColorStop(0, '#e8364f'); g.addColorStop(1, '#2c5bd8');
       x.fillStyle = g; x.fillRect(0, 0, W, H);
       x.fillStyle = '#fff';
-      const testo = 'PROVA ' + formato.w + '×' + formato.h;
+      const testo = 'TEST ' + formato.w + '×' + formato.h;
       let corpo = Math.round(H * 0.5);
       x.font = 'bold ' + corpo + 'px system-ui, sans-serif';
       const largo = x.measureText(testo).width;

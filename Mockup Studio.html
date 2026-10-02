@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="it">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -14,12 +14,12 @@
       <img class="marchio-logo" src="Logo/TGI-Sport_black.png" alt="TGI Sport" onerror="this.remove()">
       <span class="marchio-nome">Mockup Studio</span>
     </div>
-    <nav class="schede" role="tablist" aria-label="Sezioni">
-      <button type="button" role="tab" data-vista="mockup" aria-selected="true">Crea mockup</button>
-      <button type="button" role="tab" data-vista="template" aria-selected="false">Template</button>
+    <nav class="schede" role="tablist" aria-label="Sections">
+      <button type="button" role="tab" data-vista="mockup" aria-selected="true">Create mockup</button>
+      <button type="button" role="tab" data-vista="template" aria-selected="false">Templates</button>
     </nav>
     <span class="spazio"></span>
-    <button type="button" class="esci" id="btn-esci" hidden>Esci</button>
+    <button type="button" class="esci" id="btn-esci" hidden>Sign out</button>
   </header>
 
   <!-- Accesso con la password del team (i template sono cifrati) -->
@@ -27,11 +27,11 @@
     <form class="accesso-scheda" id="accesso-form" autocomplete="on">
       <img class="accesso-logo" src="Logo/TGI-Sport_black.png" alt="TGI Sport" onerror="this.remove()">
       <h1>Mockup Studio</h1>
-      <p>Inserisci la password del team per entrare.</p>
+      <p>Enter the team password to sign in.</p>
       <label class="campo"><span>Password</span><input type="password" id="accesso-password" autocomplete="current-password" required></label>
-      <label class="spunta"><input type="checkbox" id="accesso-ricorda" checked><span>Ricorda su questo computer</span></label>
+      <label class="spunta"><input type="checkbox" id="accesso-ricorda" checked><span>Remember on this computer</span></label>
       <div class="errore" id="accesso-errore" role="alert" hidden></div>
-      <button type="submit" class="primario" id="accesso-entra">Entra</button>
+      <button type="submit" class="primario" id="accesso-entra">Sign in</button>
     </form>
   </div>
 
@@ -40,11 +40,11 @@
     <section class="vista" id="vista-mockup">
       <aside class="pannello">
         <section class="passo">
-          <h2><span class="n">1</span>Cliente e tipologia</h2>
-          <label class="campo"><span>Cliente</span><select id="sel-cliente"></select></label>
-          <div class="segmentato griglia" id="sel-tipo" role="radiogroup" aria-label="Tipologia"></div>
-          <p class="nota" id="nota-tipi" hidden>In grigio le tipologie senza un'immagine per questo cliente: si aggiungono dalla scheda Template.</p>
-          <label class="campo" id="campo-scena" hidden><span>Immagine</span><select id="sel-scena"></select></label>
+          <h2><span class="n">1</span>Client and type</h2>
+          <label class="campo"><span>Client</span><select id="sel-cliente"></select></label>
+          <div class="segmentato griglia" id="sel-tipo" role="radiogroup" aria-label="Type"></div>
+          <p class="nota" id="nota-tipi" hidden>Greyed-out types have no image for this client: add them in the Templates tab.</p>
+          <label class="campo" id="campo-scena" hidden><span>Image</span><select id="sel-scena"></select></label>
         </section>
 
         <section class="passo">
@@ -52,113 +52,113 @@
           <label class="drop" id="drop">
             <input type="file" id="file-logo" accept=".ai,.pdf,.svg,.png,.jpg,.jpeg,.webp,image/*,application/pdf">
             <svg class="drop-icona" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16V4m0 0-4.5 4.5M12 4l4.5 4.5M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            <span class="drop-testo"><b>Trascina qui il logo</b><br>oppure clicca per sceglierlo</span>
+            <span class="drop-testo"><b>Drop the logo here</b><br>or click to choose it</span>
             <span class="drop-formati">.ai · .pdf · .svg · .png · .jpg</span>
           </label>
           <div class="file" id="file-info" hidden>
             <div class="file-riga">
               <span class="file-nome" id="file-nome"></span>
-              <button type="button" class="icona" id="btn-cambia-logo" title="Cambia logo" aria-label="Cambia logo">
+              <button type="button" class="icona" id="btn-cambia-logo" title="Change logo" aria-label="Change logo">
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
               </button>
             </div>
             <div class="file-meta" id="file-meta"></div>
-            <div class="file-miniatura sfondo-scacchi"><img id="file-miniatura" alt="Anteprima del file originale"></div>
-            <label class="campo" id="campo-pagina" hidden><span>Tavola</span><select id="sel-pagina"></select></label>
+            <div class="file-miniatura sfondo-scacchi"><img id="file-miniatura" alt="Preview of the original file"></div>
+            <label class="campo" id="campo-pagina" hidden><span>Artboard</span><select id="sel-pagina"></select></label>
             <div class="rilevato" id="rilevato"></div>
-            <label class="spunta"><input type="checkbox" id="chk-composto"><span>Usa il file così com'è <small>(già composto)</small></span></label>
+            <label class="spunta"><input type="checkbox" id="chk-composto"><span>Use the file as it is <small>(already composed)</small></span></label>
           </div>
           <div class="errore" id="errore-logo" role="alert" hidden></div>
         </section>
 
         <section class="passo" id="passo-composizione">
-          <h2><span class="n">3</span>Composizione</h2>
+          <h2><span class="n">3</span>Composition</h2>
           <div class="gruppo" id="blocco-sfondo-logo" hidden>
-            <label class="campo"><span>Sfondo del file del logo</span>
+            <label class="campo"><span>Logo file background</span>
               <select id="sel-rimuovi">
-                <option value="no">Mantienilo com'è</option>
-                <option value="ovunque">Togli un colore (ovunque)</option>
-                <option value="contorno">Togli un colore solo attorno al logo</option>
+                <option value="no">Keep it as it is</option>
+                <option value="ovunque">Remove a colour (everywhere)</option>
+                <option value="contorno">Remove a colour only around the logo</option>
               </select>
             </label>
             <p class="nota" id="nota-sfondo"></p>
             <div class="campo" id="campo-colore-rimozione">
-              <span>Colore da togliere</span>
+              <span>Colour to remove</span>
               <div class="colore">
-                <input type="color" id="col-rimozione" value="#ffffff" aria-label="Colore da togliere">
-                <input type="text" id="hex-rimozione" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Codice del colore da togliere">
-                <button type="button" class="contagocce" id="btn-contagocce" title="Preleva il colore dallo schermo, per esempio dall'anteprima del file" aria-label="Preleva il colore dallo schermo" hidden>
+                <input type="color" id="col-rimozione" value="#ffffff" aria-label="Colour to remove">
+                <input type="text" id="hex-rimozione" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Hex code of the colour to remove">
+                <button type="button" class="contagocce" id="btn-contagocce" title="Pick the colour from the screen, for example from the file preview" aria-label="Pick the colour from the screen" hidden>
                   <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="m2 22 1-1h3l9-9"/><path d="M3 21v-3l9-9"/><path d="m15 6 3.4-3.4a2.1 2.1 0 1 1 3 3L18 9l.4.4a2.1 2.1 0 1 1-3 3l-3.8-3.8a2.1 2.1 0 1 1 3-3l.4.4Z"/></svg>
                 </button>
               </div>
             </div>
-            <label class="campo cursore" id="campo-tolleranza"><span>Tolleranza <output id="out-tol"></output></span><input type="range" id="rng-tol" min="5" max="120" step="1"></label>
+            <label class="campo cursore" id="campo-tolleranza"><span>Tolerance <output id="out-tol"></output></span><input type="range" id="rng-tol" min="5" max="120" step="1"></label>
           </div>
           <div class="gruppo" id="blocco-colore-logo" hidden>
             <div class="campo">
-              <span>Colore del logo</span>
-              <div class="segmentato compatto" id="sel-colore-logo" role="radiogroup" aria-label="Colore del logo">
-                <button type="button" role="radio" data-colore-logo="originale"><b>Originale</b></button>
-                <button type="button" role="radio" data-colore-logo="tinta"><b>Cambia colore</b></button>
+              <span>Logo colour</span>
+              <div class="segmentato compatto" id="sel-colore-logo" role="radiogroup" aria-label="Logo colour">
+                <button type="button" role="radio" data-colore-logo="originale"><b>Original</b></button>
+                <button type="button" role="radio" data-colore-logo="tinta"><b>Change colour</b></button>
               </div>
             </div>
             <div class="campo" id="campo-colore-logo" hidden>
               <div class="campioni" id="campioni-logo"></div>
               <div class="colore">
-                <input type="color" id="col-logo" value="#ffffff" aria-label="Nuovo colore del logo">
-                <input type="text" id="hex-logo" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Codice del nuovo colore del logo">
+                <input type="color" id="col-logo" value="#ffffff" aria-label="New logo colour">
+                <input type="text" id="hex-logo" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Hex code of the new logo colour">
               </div>
             </div>
             <p class="nota" id="nota-colore-logo"></p>
           </div>
           <div class="campo">
-            <span>Sfondo della grafica</span>
+            <span>Artwork background</span>
             <div class="campioni" id="campioni"></div>
             <div class="colore">
-              <input type="color" id="col-sfondo" value="#ffffff" aria-label="Scegli colore">
-              <input type="text" id="hex-sfondo" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Codice colore" placeholder="trasparente">
+              <input type="color" id="col-sfondo" value="#ffffff" aria-label="Choose colour">
+              <input type="text" id="hex-sfondo" value="#FFFFFF" maxlength="7" spellcheck="false" aria-label="Colour hex code" placeholder="transparent">
             </div>
-            <p class="nota" id="nota-trasparente" hidden>Sfondo trasparente: nel mockup, attorno al logo si vede la foto. Serve una foto senza vecchi loghi in quella posizione.</p>
+            <p class="nota" id="nota-trasparente" hidden>Transparent background: in the mockup the photo shows around the logo, so the photo must have no old logos in that position.</p>
           </div>
-          <label class="campo cursore"><span>Dimensione logo <output id="out-dim"></output></span><input type="range" id="rng-dim" min="10" max="120" step="1"></label>
-          <label class="campo cursore"><span>Spostamento orizzontale <output id="out-x"></output></span><input type="range" id="rng-x" min="-40" max="40" step="0.5"></label>
-          <label class="campo cursore"><span>Spostamento verticale <output id="out-y"></output></span><input type="range" id="rng-y" min="-40" max="40" step="0.5"></label>
-          <button type="button" class="link" id="btn-ricentra">Ricentra e ripristina dimensione</button>
+          <label class="campo cursore"><span>Logo size <output id="out-dim"></output></span><input type="range" id="rng-dim" min="10" max="120" step="1"></label>
+          <label class="campo cursore"><span>Horizontal offset <output id="out-x"></output></span><input type="range" id="rng-x" min="-40" max="40" step="0.5"></label>
+          <label class="campo cursore"><span>Vertical offset <output id="out-y"></output></span><input type="range" id="rng-y" min="-40" max="40" step="0.5"></label>
+          <button type="button" class="link" id="btn-ricentra">Recentre and reset size</button>
         </section>
 
         <section class="passo" id="passo-posizioni">
-          <h2><span class="n">4</span>Posizioni</h2>
+          <h2><span class="n">4</span>Positions</h2>
           <div class="campo" id="blocco-competizione" hidden>
-            <span>Competizione</span>
-            <div class="segmentato griglia competizioni" id="sel-variante" role="radiogroup" aria-label="Competizione"></div>
-            <p class="nota">Sui tappeti fissi (es. gli interni) va la grafica della competizione scelta.</p>
+            <span>Competition</span>
+            <div class="segmentato griglia competizioni" id="sel-variante" role="radiogroup" aria-label="Competition"></div>
+            <p class="nota">The fixed mats (e.g. the inner ones) show the artwork of the chosen competition.</p>
           </div>
           <div class="campo" id="campo-posizioni">
-            <span id="etichetta-posizioni" hidden>Posizioni del logo</span>
+            <span id="etichetta-posizioni" hidden>Logo positions</span>
             <div class="posizioni" id="lista-posizioni"></div>
           </div>
         </section>
 
         <section class="passo">
-          <h2><span class="n">5</span>Salva</h2>
-          <label class="campo"><span>Nome brand</span><input type="text" id="txt-brand" placeholder="es. Nike" autocomplete="off" spellcheck="false"></label>
+          <h2><span class="n">5</span>Save</h2>
+          <label class="campo"><span>Brand name</span><input type="text" id="txt-brand" placeholder="e.g. Nike" autocomplete="off" spellcheck="false"></label>
           <ul class="uscite" id="uscite"></ul>
           <div class="cartella" id="cartella"></div>
-          <button type="button" class="primario" id="btn-salva">Salva PNG + JPG</button>
+          <button type="button" class="primario" id="btn-salva">Save PNG + JPG</button>
           <div class="secondari">
-            <button type="button" id="btn-png">Solo PNG</button>
-            <button type="button" id="btn-jpg">Solo JPG</button>
+            <button type="button" id="btn-png">PNG only</button>
+            <button type="button" id="btn-jpg">JPG only</button>
           </div>
         </section>
       </aside>
 
       <div class="area">
         <div class="barra">
-          <div class="segmentato piccolo" id="sel-zoom" role="radiogroup" aria-label="Inquadratura">
-            <button type="button" role="radio" data-zoom="intera">Intera</button>
-            <button type="button" role="radio" data-zoom="dettaglio">Dettaglio</button>
+          <div class="segmentato piccolo" id="sel-zoom" role="radiogroup" aria-label="View">
+            <button type="button" role="radio" data-zoom="intera">Full</button>
+            <button type="button" role="radio" data-zoom="dettaglio">Detail</button>
           </div>
-          <button type="button" class="tieni" id="btn-originale" title="Tieni premuto per vedere l'immagine senza il logo">Tieni premuto: originale</button>
+          <button type="button" class="tieni" id="btn-originale" title="Press and hold to see the image without the logo">Hold for original</button>
           <span class="spazio"></span>
           <span class="misura" id="misura-mockup"></span>
         </div>
@@ -173,7 +173,7 @@
         </div>
         <div class="produzione">
           <div class="produzione-info">
-            <b>PNG di produzione</b>
+            <b>Production PNG</b>
             <span id="misura-png"></span>
           </div>
           <div class="scacchiera" id="box-artwork"><canvas id="cv-artwork"></canvas></div>
@@ -185,105 +185,105 @@
     <section class="vista" id="vista-template" hidden>
       <aside class="pannello">
         <section class="passo">
-          <h2>Template cliente</h2>
+          <h2>Client template</h2>
           <label class="campo"><span>Template</span><select id="ed-sel-template"></select></label>
           <div class="secondari">
-            <button type="button" id="ed-nuovo">+ Nuovo</button>
-            <label class="bottone">Importa file…<input type="file" id="ed-importa" accept=".js,.json" hidden></label>
+            <button type="button" id="ed-nuovo">+ New</button>
+            <label class="bottone">Import file…<input type="file" id="ed-importa" accept=".js,.json" hidden></label>
           </div>
-          <label class="campo"><span>Nome del cliente</span><input type="text" id="ed-nome" autocomplete="off"></label>
+          <label class="campo"><span>Client name</span><input type="text" id="ed-nome" autocomplete="off"></label>
           <p class="nota">File: <code id="ed-file"></code></p>
         </section>
 
         <section class="passo">
-          <h2>Immagini</h2>
+          <h2>Images</h2>
           <div class="lista" id="ed-scene"></div>
-          <label class="bottone pieno">+ Aggiungi immagine<input type="file" id="ed-file-scena" accept="image/jpeg,image/png,image/webp" hidden></label>
+          <label class="bottone pieno">+ Add image<input type="file" id="ed-file-scena" accept="image/jpeg,image/png,image/webp" hidden></label>
         </section>
 
         <section class="passo" id="ed-passo-scena" hidden>
-          <h2>Immagine selezionata</h2>
-          <label class="campo"><span>Nome</span><input type="text" id="ed-nome-scena" autocomplete="off"></label>
-          <label class="bottone pieno sostituisci" title="Per esempio con la foto pulita, senza loghi: posizioni e competizioni restano">Sostituisci la foto (le posizioni restano)<input type="file" id="ed-file-sostituisci" accept="image/jpeg,image/png,image/webp" hidden></label>
-          <div class="segmentato griglia" id="ed-tipo-scena" role="radiogroup" aria-label="Tipologia dell'immagine"></div>
-          <h3>Posizioni</h3>
+          <h2>Selected image</h2>
+          <label class="campo"><span>Name</span><input type="text" id="ed-nome-scena" autocomplete="off"></label>
+          <label class="bottone pieno sostituisci" title="For example with the clean photo, without logos: positions and competitions are kept">Replace the photo (positions are kept)<input type="file" id="ed-file-sostituisci" accept="image/jpeg,image/png,image/webp" hidden></label>
+          <div class="segmentato griglia" id="ed-tipo-scena" role="radiogroup" aria-label="Image type"></div>
+          <h3>Positions</h3>
           <div class="lista" id="ed-posizioni"></div>
           <div class="secondari">
-            <button type="button" id="ed-aggiungi-pos">+ Posizione logo</button>
-            <button type="button" id="ed-aggiungi-comp">+ Posizione competizione</button>
+            <button type="button" id="ed-aggiungi-pos">+ Logo position</button>
+            <button type="button" id="ed-aggiungi-comp">+ Competition position</button>
           </div>
           <div class="punto" id="ed-punto" hidden>
             <span id="ed-punto-nome"></span>
             <label>X <input type="number" id="ed-punto-x" step="0.1"></label>
             <label>Y <input type="number" id="ed-punto-y" step="0.1"></label>
           </div>
-          <label class="spunta"><input type="checkbox" id="ed-prova" checked><span>Mostra artwork di prova</span></label>
+          <label class="spunta"><input type="checkbox" id="ed-prova" checked><span>Show test artwork</span></label>
           <p class="nota" id="ed-aiuto"></p>
 
           <div id="ed-blocco-competizioni">
-            <h3>Competizioni</h3>
-            <p class="nota">Le posizioni <b>Competizione</b> (es. i tappeti interni) mostrano la grafica della competizione scelta in <i>Crea mockup</i>, per esempio <i>Domestico</i> = enilive e <i>Internazionale</i> = 1xbet, e non ricevono il logo del brand.</p>
+            <h3>Competitions</h3>
+            <p class="nota"><b>Competition</b> positions (e.g. the inner mats) show the artwork of the competition chosen in <i>Create mockup</i>, for example enilive for domestic matches and 1xbet for international ones, and never receive the brand logo.</p>
             <div class="lista" id="ed-varianti"></div>
             <div class="secondari">
-              <label class="bottone">+ Aggiungi grafica<input type="file" id="ed-file-variante" accept="image/png,image/jpeg,image/webp" hidden></label>
-              <select id="ed-copia-comp" aria-label="Copia le competizioni da un altro cliente"><option value="">Copia da un cliente…</option></select>
+              <label class="bottone">+ Add artwork<input type="file" id="ed-file-variante" accept="image/png,image/jpeg,image/webp" hidden></label>
+              <select id="ed-copia-comp" aria-label="Copy the competitions from another client"><option value="">Copy from a client…</option></select>
             </div>
           </div>
 
           <div id="ed-blocco-spessore" hidden>
-            <h3>Spessore dei tappeti</h3>
-            <label class="spunta"><input type="checkbox" id="ed-spessore"><span>Aggiungi lo spessore nel mockup</span></label>
+            <h3>Mat thickness</h3>
+            <label class="spunta"><input type="checkbox" id="ed-spessore"><span>Add thickness in the mockup</span></label>
             <div id="ed-spessore-campi" hidden>
               <div class="campo">
-                <span>Colore</span>
+                <span>Colour</span>
                 <div class="colore">
-                  <input type="color" id="ed-spessore-colore" value="#a0a0a0" aria-label="Colore dello spessore">
-                  <input type="text" id="ed-spessore-hex" maxlength="7" spellcheck="false" aria-label="Codice del colore dello spessore">
+                  <input type="color" id="ed-spessore-colore" value="#a0a0a0" aria-label="Thickness colour">
+                  <input type="text" id="ed-spessore-hex" maxlength="7" spellcheck="false" aria-label="Hex code of the thickness colour">
                 </div>
               </div>
-              <label class="campo cursore"><span>Profondità <output id="ed-spessore-out"></output></span><input type="range" id="ed-spessore-prof" min="1" max="20" step="0.5"></label>
-              <label class="campo"><span>Lato</span>
+              <label class="campo cursore"><span>Depth <output id="ed-spessore-out"></output></span><input type="range" id="ed-spessore-prof" min="1" max="20" step="0.5"></label>
+              <label class="campo"><span>Side</span>
                 <select id="ed-spessore-lato">
-                  <option value="auto">Automatico: in alto e sul lato corto più basso</option>
-                  <option value="sinistra">Porta a sinistra: in alto e a sinistra</option>
-                  <option value="destra">Porta a destra: in alto e a destra</option>
+                  <option value="auto">Automatic: top and lower short side</option>
+                  <option value="sinistra">Goal on the left: top and left</option>
+                  <option value="destra">Goal on the right: top and right</option>
                 </select>
               </label>
             </div>
-            <p class="nota">Vale per tutti i tappeti di questa immagine, anche quelli delle competizioni. Il PNG di produzione resta senza spessore.</p>
+            <p class="nota">Applies to every mat in this image, competition mats included. The production PNG has no thickness.</p>
           </div>
         </section>
 
         <section class="passo">
-          <h2>Salva template</h2>
+          <h2>Save template</h2>
           <p class="nota" id="ed-nota-salva"></p>
-          <button type="button" class="primario" id="ed-salva">Salva nella cartella templates</button>
-          <div class="secondari"><button type="button" id="ed-scarica">Scarica i file</button></div>
+          <button type="button" class="primario" id="ed-salva">Save to the templates folder</button>
+          <div class="secondari"><button type="button" id="ed-scarica">Download the files</button></div>
         </section>
 
         <section class="passo">
-          <h2>Password del team</h2>
+          <h2>Team password</h2>
           <p class="nota" id="ed-nota-password"></p>
           <form id="ed-form-password">
-            <label class="campo"><span>Nuova password</span><input type="password" id="ed-nuova-password" autocomplete="new-password" minlength="8"></label>
-            <label class="campo"><span>Ripeti la nuova password</span><input type="password" id="ed-conferma-password" autocomplete="new-password" minlength="8"></label>
-            <button type="submit" class="bottone pieno" id="ed-cambia-password">Imposta la nuova password</button>
+            <label class="campo"><span>New password</span><input type="password" id="ed-nuova-password" autocomplete="new-password" minlength="8"></label>
+            <label class="campo"><span>Repeat the new password</span><input type="password" id="ed-conferma-password" autocomplete="new-password" minlength="8"></label>
+            <button type="submit" class="bottone pieno" id="ed-cambia-password">Set the new password</button>
           </form>
         </section>
       </aside>
 
       <div class="area">
         <div class="barra">
-          <button type="button" class="piccolo" id="ed-adatta">Adatta</button>
+          <button type="button" class="piccolo" id="ed-adatta">Fit</button>
           <button type="button" class="piccolo" id="ed-100">100%</button>
           <span class="misura" id="ed-zoom"></span>
           <span class="spazio"></span>
-          <span class="suggerimento">Rotella: zoom · Trascina una posizione: la sposti tutta · Spazio + trascina: sposti la vista · Frecce: punto o posizione (⇧ ×10, ⌥ ×0,1)</span>
+          <span class="suggerimento">Scroll: zoom · Drag a position: move it whole · Space + drag: pan · Arrows: point or position (⇧ ×10, ⌥ ×0.1)</span>
         </div>
         <div class="palco editor" id="ed-palco" tabindex="0">
           <canvas id="ed-canvas"></canvas>
           <canvas class="lente" id="ed-lente" width="176" height="176" hidden></canvas>
-          <div class="palco-messaggio" id="ed-messaggio">Scegli un template o aggiungi un'immagine per iniziare.</div>
+          <div class="palco-messaggio" id="ed-messaggio">Choose a template or add an image to get started.</div>
         </div>
       </div>
     </section>

@@ -109,7 +109,7 @@
     await MK.accesso.sblocca();
     riempiClienti();
     if (!elenco.length) {
-      messaggioPalco('Nessun template trovato.<br>Controlla che la cartella <b>templates</b> sia accanto a questa pagina.');
+      messaggioPalco('No templates found.<br>Check that the <b>templates</b> folder is next to this page.');
       return;
     }
     const ultimo = ricordato('cliente');
@@ -140,11 +140,11 @@
       const tipi = [...new Set(t.scene.map((s) => s.tipo))];
       document.querySelectorAll('#sel-tipo button').forEach((b) => {
         b.disabled = !tipi.includes(b.dataset.tipo);
-        b.title = b.disabled ? 'Nessuna immagine di questa tipologia per il cliente: aggiungila dalla scheda Template' : '';
+        b.title = b.disabled ? 'This client has no image of this type: add one in the Templates tab' : '';
       });
       $('nota-tipi').hidden = tipi.length >= Object.keys(MK.TIPI).length;
       if (!tipi.length) {
-        messaggioPalco('Questo template non contiene immagini.');
+        messaggioPalco('This template has no images.');
         return;
       }
       await selezionaTipo(tipi.includes(stato.tipo) ? stato.tipo : tipi[0], true);
@@ -368,9 +368,9 @@
     $('file-info').hidden = !s;
     if (!s) { aggiornaControlli(); return; }
     $('file-nome').textContent = s.nome;
-    const tipoFile = s.vettoriale ? 'vettoriale' : 'immagine';
+    const tipoFile = s.vettoriale ? 'vector' : 'image';
     $('file-meta').textContent = s.vettoriale
-      ? tipoFile + ' · convertito a ' + stato.rifilatoGrezzo.width + ' × ' + stato.rifilatoGrezzo.height + ' px'
+      ? tipoFile + ' · converted to ' + stato.rifilatoGrezzo.width + ' × ' + stato.rifilatoGrezzo.height + ' px'
       : tipoFile + ' · ' + s.larghezza + ' × ' + s.altezza + ' px';
     const campoPag = $('campo-pagina');
     campoPag.hidden = !(s.pagine > 1);
@@ -380,28 +380,28 @@
         sel.innerHTML = '';
         for (let i = 1; i <= s.pagine; i++) {
           const o = document.createElement('option');
-          o.value = i; o.textContent = 'Tavola ' + i + ' di ' + s.pagine;
+          o.value = i; o.textContent = 'Artboard ' + i + ' of ' + s.pagine;
           sel.appendChild(o);
         }
       }
       sel.value = s.pagina;
     }
     const f = formato();
-    const forma = f.forma === 'cerchio' ? 'cerchio ' + f.w + ' px' : 'rettangolo ' + f.w + '×' + f.h;
+    const forma = f.forma === 'cerchio' ? f.w + ' px circle' : f.w + '×' + f.h + ' rectangle';
     const box = $('rilevato');
     if (stato.rilevato) {
       box.className = 'rilevato si';
       box.textContent = stato.passthrough
-        ? 'File già pronto (' + forma + '): il PNG di produzione sarà il file originale, identico.'
-        : 'Riconosciuto come già composto (' + forma + '): verrà usato così com\'è, portato a ' + f.w + '×' + f.h + ' px.';
+        ? 'Ready-made file (' + forma + '): the production PNG will be the original file, unchanged.'
+        : 'Recognised as already composed (' + forma + '): it will be used as it is, resized to ' + f.w + '×' + f.h + ' px.';
     } else if (stato.composto) {
       box.className = 'rilevato attenzione';
-      box.textContent = 'Il file non sembra un ' + forma + ' già pronto: usandolo così com\'è verrà adattato (e deformato se le proporzioni non coincidono).';
+      box.textContent = 'The file does not look like a ready-made ' + forma + ': used as it is, it will be resized (and distorted if the proportions differ).';
     } else {
       box.className = 'rilevato no';
       box.textContent = f.forma === 'cerchio'
-        ? 'Logo da comporre: verrà inscritto nel cerchio da ' + f.w + ' px con lo sfondo scelto.'
-        : 'Logo da comporre: verrà inserito nel rettangolo ' + f.w + '×' + f.h + ' con lo sfondo scelto.';
+        ? 'Logo to compose: it will be inscribed in the ' + f.w + ' px circle on the chosen background.'
+        : 'Logo to compose: it will be placed in the ' + f.w + '×' + f.h + ' rectangle on the chosen background.';
     }
     $('chk-composto').checked = stato.composto;
     aggiornaControlli();
@@ -444,7 +444,7 @@
     $('col-logo').value = p.coloreLogo || stato.ultimoColoreLogo;
     if (document.activeElement !== $('hex-logo')) $('hex-logo').value = (p.coloreLogo || stato.ultimoColoreLogo).toUpperCase();
     $('nota-colore-logo').textContent = inTinta && stato.logoPieno
-      ? 'Il logo ha ancora il suo sfondo: toglilo qui sopra, altrimenti diventa un rettangolo pieno di colore.'
+      ? 'The logo still has its background: remove it above, otherwise it turns into a solid block of colour.'
       : '';
     $('rng-tol').value = stato.tolleranza;
     $('out-tol').textContent = stato.tolleranza;
@@ -457,9 +457,9 @@
     if (document.activeElement !== $('hex-rimozione')) $('hex-rimozione').value = stato.coloreRimozione.toUpperCase();
     $('btn-contagocce').hidden = !('EyeDropper' in window);
     $('nota-sfondo').textContent = !stato.sorgente ? ''
-      : L.quasiBianco(stato.uniforme) ? 'Il file ha lo sfondo bianco: viene tolto in automatico.'
-      : stato.uniforme ? 'Il file ha uno sfondo pieno colorato: se non fa parte del logo, scegli di toglierlo.'
-      : togli ? '' : 'Se il logo ha un riquadro o uno sfondo da eliminare, scegli di togliere il suo colore.';
+      : L.quasiBianco(stato.uniforme) ? 'The file has a white background: it is removed automatically.'
+      : stato.uniforme ? 'The file has a solid coloured background: if it is not part of the logo, choose to remove it.'
+      : togli ? '' : 'If the logo has a box or background to get rid of, choose to remove its colour.';
     $('passo-composizione').classList.toggle('disattivo', !!(stato.sorgente && stato.composto));
     riempiCampioni();
     riempiCampioniLogo();
@@ -467,7 +467,7 @@
 
   function fmt(v) {
     const r = Math.round(v * 10) / 10;
-    return (r > 0 ? '+' : '') + String(r).replace('.', ',') + '%';
+    return (r > 0 ? '+' : '') + String(r) + '%';
   }
 
   function riempiCampioni() {
@@ -482,8 +482,8 @@
     const trasparente = document.createElement('button');
     trasparente.type = 'button';
     trasparente.className = 'campione trasparente';
-    trasparente.title = 'Nessuno sfondo (trasparente)';
-    trasparente.setAttribute('aria-label', 'Nessuno sfondo, trasparente');
+    trasparente.title = 'No background (transparent)';
+    trasparente.setAttribute('aria-label', 'No background, transparent');
     trasparente.setAttribute('aria-pressed', String(!stato.p.sfondo));
     trasparente.addEventListener('click', () => impostaSfondo(null));
     box.appendChild(trasparente);
@@ -492,15 +492,15 @@
       b.type = 'button';
       b.className = 'campione';
       b.style.background = c;
-      b.title = c.toUpperCase() + (i < stato.colori.length ? ' (dal logo)' : '');
-      b.setAttribute('aria-label', 'Sfondo ' + c.toUpperCase());
+      b.title = c.toUpperCase() + (i < stato.colori.length ? ' (from the logo)' : '');
+      b.setAttribute('aria-label', 'Background ' + c.toUpperCase());
       b.setAttribute('aria-pressed', String(c === (stato.p.sfondo || '').toLowerCase()));
       b.addEventListener('click', () => impostaSfondo(c));
       box.appendChild(b);
     });
     const e = document.createElement('span');
     e.className = 'campioni-etichetta';
-    e.textContent = stato.colori.length ? 'Trasparente, colori presi dal logo, bianco e nero' : 'Trasparente, bianco e nero';
+    e.textContent = stato.colori.length ? 'Transparent, colours from the logo, white and black' : 'Transparent, white and black';
     box.appendChild(e);
   }
 
@@ -517,7 +517,7 @@
       b.className = 'campione';
       b.style.background = k;
       b.title = k.toUpperCase();
-      b.setAttribute('aria-label', 'Logo ' + k.toUpperCase());
+      b.setAttribute('aria-label', 'Logo colour ' + k.toUpperCase());
       b.setAttribute('aria-pressed', String(k === (stato.p.coloreLogo || '').toLowerCase()));
       b.addEventListener('click', () => impostaColoreLogo(k));
       box.appendChild(b);
@@ -599,8 +599,8 @@
     ctx.clearRect(0, 0, f.w, f.h);
     if (a) ctx.drawImage(a, 0, 0, f.w, f.h);
     cv.style.opacity = a ? '1' : '.35';
-    const info = f.w + ' × ' + f.h + ' px' + (f.forma === 'cerchio' ? '<br>cerchio, fuori trasparente' : '');
-    $('misura-png').innerHTML = info + (stato.passthrough && stato.composto ? '<br>file originale del cliente' : '');
+    const info = f.w + ' × ' + f.h + ' px' + (f.forma === 'cerchio' ? '<br>circle, transparent outside' : '');
+    $('misura-png').innerHTML = info + (stato.passthrough && stato.composto ? '<br>original client file' : '');
   }
 
   function preparaTela() {
@@ -680,7 +680,7 @@
     const w = stato.immagine ? stato.immagine.naturalWidth : 0, h = stato.immagine ? stato.immagine.naturalHeight : 0;
     const vuoto = !nomeBrand();
     $('uscite').innerHTML =
-      '<li><code>' + esc(base) + '.png</code><span>produzione ' + f.w + '×' + f.h + '</span></li>' +
+      '<li><code>' + esc(base) + '.png</code><span>production ' + f.w + '×' + f.h + '</span></li>' +
       '<li><code>' + esc(nomeJpg()) + '.jpg</code><span>mockup ' + w + '×' + h + '</span></li>';
     $('uscite').style.opacity = vuoto ? '.5' : '1';
     const pronto = !!stato.sorgente;
@@ -692,13 +692,13 @@
   function aggiornaCartella() {
     const el = $('cartella');
     if (!A.supportato) {
-      el.innerHTML = 'I file verranno scaricati nella cartella <b>Download</b> del browser.';
+      el.innerHTML = 'Files will be downloaded to the <b>Downloads</b> folder.';
       return;
     }
     if (cartella.handle) {
-      el.innerHTML = 'Salva nella cartella <b>' + esc(cartella.handle.name) + '</b> · <button type="button" class="link" data-azione="scegli">Cambia</button> · <button type="button" class="link" data-azione="download">Usa Download</button>';
+      el.innerHTML = 'Saving to the <b>' + esc(cartella.handle.name) + '</b> folder · <button type="button" class="link" data-azione="scegli">Change</button> · <button type="button" class="link" data-azione="download">Use Downloads</button>';
     } else {
-      el.innerHTML = 'I file andranno nella cartella <b>Download</b> · <button type="button" class="link" data-azione="scegli">Scegli una cartella…</button>';
+      el.innerHTML = 'Files will go to the <b>Downloads</b> folder · <button type="button" class="link" data-azione="scegli">Choose a folder…</button>';
     }
   }
 
@@ -715,18 +715,18 @@
   }
 
   async function salva(quali) {
-    if (!stato.sorgente) return avvisa('Carica prima il logo.', 'errore');
+    if (!stato.sorgente) return avvisa('Load a logo first.', 'errore');
     if (!nomeBrand()) {
       $('txt-brand').focus();
-      return avvisa('Scrivi il nome del brand: serve per dare il nome ai file.', 'errore');
+      return avvisa('Enter the brand name: it is used to name the files.', 'errore');
     }
     if (quali.includes('jpg') && !stato.attive[stato.scena.id].size) {
-      return avvisa('Seleziona almeno una posizione per il mockup.', 'errore');
+      return avvisa('Select at least one position for the mockup.', 'errore');
     }
     let inCartella = false;
     if (cartella.handle) {
       try { inCartella = await cartella.permesso(); } catch (e) { inCartella = false; }
-      if (!inCartella) avvisa('Accesso alla cartella non concesso: uso i Download.', 'errore');
+      if (!inCartella) avvisa('Folder access not granted: saving to Downloads instead.', 'errore');
     }
     caricamento(true);
     try {
@@ -734,20 +734,20 @@
       const files = [];
       if (quali.includes('png')) files.push({ nome: base + '.png', blob: await blobPNG() });
       if (quali.includes('jpg')) files.push({ nome: nomeJpg() + '.jpg', blob: await blobJPG() });
-      const nomi = files.map((f) => f.nome).join(' e ');
+      const nomi = files.map((f) => f.nome).join(' and ');
       if (inCartella) {
         const esistenti = [];
         for (const f of files) if (await cartella.esiste(f.nome)) esistenti.push(f.nome);
-        if (esistenti.length && !window.confirm('Nella cartella «' + cartella.handle.name + '» esiste già ' + esistenti.join(' e ') + '.\nVuoi sostituire?')) return;
+        if (esistenti.length && !window.confirm('The folder “' + cartella.handle.name + '” already contains ' + esistenti.join(' and ') + '.\nOverwrite?')) return;
         for (const f of files) await cartella.salva(f.nome, f.blob);
-        avvisa('Salvati in «' + cartella.handle.name + '»: ' + nomi, 'ok');
+        avvisa('Saved to “' + cartella.handle.name + '”: ' + nomi, 'ok');
       } else {
         await A.scaricaTutti(files);
-        avvisa('Scaricati: ' + nomi, 'ok');
+        avvisa('Downloaded: ' + nomi, 'ok');
       }
     } catch (e) {
       console.error(e);
-      avvisa('Salvataggio non riuscito: ' + e.message, 'errore');
+      avvisa('Save failed: ' + e.message, 'errore');
     } finally {
       caricamento(false);
     }
