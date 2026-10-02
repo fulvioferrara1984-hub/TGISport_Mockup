@@ -39,10 +39,10 @@ Per ogni cliente compaiono le tipologie per cui il template ha almeno un'immagin
    - **Logo colour**: *Original* oppure *Change colour*, che ricolora tutto il logo in tinta unita (es. logo nero → giallo). Va fatto dopo aver tolto lo sfondo del file, altrimenti si colora anche quello.
    - **Artwork background**: un colore (quelli presi dal logo, bianco, nero o uno qualsiasi) oppure **trasparente** (il primo quadratino a scacchi): il PNG di produzione avrà solo il logo. Nel mockup attorno al logo si vede la foto, quindi serve una foto senza vecchi loghi in quella posizione.
    - Dimensione e posizione del logo.
-4. **Positions**: scegli dove inserire il logo; passando il mouse su una posizione, si evidenzia nell'anteprima. Se l'immagine ha delle **competizioni** (es. tappeti Inter), scegli *Domestico* o *Internazionale*: sulle posizioni fisse (i tappeti interni) va la grafica di quella competizione.
+4. **Positions**: scegli dove inserire il logo; passando il mouse su una posizione, si evidenzia nell'anteprima. Se l'immagine ha delle **competizioni** (es. i tappeti con enilive e 1xbet), scegli *Domestic* o *International*: sulle posizioni fisse (i tappeti interni) va la grafica di quella competizione.
 5. **Save**: scrivi il nome del brand (*Brand name*) e premi *Save PNG + JPG*. Si ottengono:
    - `Brand_<tipologia>.png` (es. `Brand_CC.png`, `Brand_Retroporta_ground.png`) → file per la produzione
-   - `Brand_<tipologia>.jpg` → mockup da inviare al cliente; se c'è una competizione il suo nome è aggiunto al JPG (es. `Brand_MATS_Internazionale.jpg`)
+   - `Brand_<tipologia>.jpg` → mockup da inviare al cliente; se c'è una competizione il suo nome è aggiunto al JPG (es. `Brand_MATS_International.jpg`)
 
 In anteprima: *Detail* ingrandisce sulle posizioni, *Hold for original* (tenuto premuto) mostra la foto senza logo.
 
@@ -56,9 +56,9 @@ Nella scheda **Templates**:
 2. **Centro campo**: *+ Add image* → foto del centrocampo → tipologia *Centre circle* → *+ Add position*. Porta i 4 punti sulla linea del cerchio: *top* e *bottom* dove la linea di metà campo incrocia il cerchio, *right* e *left* all'altezza del dischetto. L'ellisse deve combaciare con il cerchio e il mirino cadere sul dischetto.
 3. **Tappeti, Additional, Retroporta ground e vertical**: *+ Add image* → foto → scegli la tipologia → una posizione per ogni area (vedi sotto). Porta i 4 angoli sull'area dove andrà la grafica, nell'ordine in cui si legge il logo (*top left*, *top right*, *bottom right*, *bottom left*).
    - Per ogni area usa **+ Logo position** (riceve il logo del brand) oppure **+ Competition position** (es. i tappeti interni enilive / 1xbet). La nuova posizione compare al centro della vista: **trascinala dall'interno** fin sulla zona giusta, poi sistema i 4 punti. Il tipo si cambia anche dopo, con *Logo / Competition* sotto il nome della posizione.
-   - **Competizioni** (*Competitions*): la prima *Competition position* copia in automatico le competizioni da un cliente che le ha già (es. Inter: *Domestico* = enilive, *Internazionale* = 1xbet). Si possono anche copiare con *Copy from a client…* o aggiungere a mano con *+ Add artwork* (stesso formato della tipologia, es. 900×100) e rinominare. In *Create mockup* compare la scelta della competizione.
+   - **Competizioni** (*Competitions*): la prima *Competition position* copia in automatico le competizioni da un cliente che le ha già (es. *Domestic* = enilive, *International* = 1xbet). Si possono anche copiare con *Copy from a client…* o aggiungere a mano con *+ Add artwork* (stesso formato della tipologia, es. 900×100) e rinominare. In *Create mockup* compare la scelta della competizione.
    - **Spessore dei tappeti** (*Mat thickness*, solo nel mockup, non nel PNG di produzione): spunta *Add thickness in the mockup* e scegli colore (*Colour*), profondità in pixel (*Depth*) e lato (*Side*). *Automatic* mette lo spessore in alto e sul lato corto più basso (*Goal on the left* → a sinistra, *Goal on the right* → a destra). Vale per tutti i tappeti dell'immagine, competizioni comprese.
-4. **Dai un nome chiaro alle posizioni** (es. *Esterno sinistra*): è quello che si vede in *Create mockup*.
+4. **Dai un nome chiaro alle posizioni** (es. *Outer Left*): è quello che si vede in *Create mockup*.
 5. **Bleed (px)**: lascia 0 con foto pulite; metti 0,6–0,7 se nella foto c'è già un vecchio logo da coprire.
 6. **Controlla** con *Show test artwork*: il motivo deve coprire esattamente la zona e la scritta *TOP* deve stare dalla parte lontana del campo.
 7. *Save to the templates folder* e scegli la cartella `templates` del progetto (solo la prima volta). I file vengono salvati **già cifrati** con la password del team. Con Safari: *Download the files* e sposta i due file nella cartella `templates`, sostituendo `elenco.js`.
