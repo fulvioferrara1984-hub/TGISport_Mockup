@@ -6,9 +6,10 @@
 
   // Tipologie di mockup e formati di produzione (la sigla finisce nel nome dei file: Brand_<sigla>.png/.jpg).
   // Aggiungere una tipologia qui basta per averla in tutta la piattaforma; una scena può sovrascrivere w/h con `formato`.
+  // piuBrand: nello stesso mockup si possono mettere due brand diversi, uno per posizione.
   MK.TIPI = {
     CC: { sigla: 'CC', nome: 'Centre circle', forma: 'cerchio', w: 500, h: 500, dimensione: 0.8 },
-    MATS: { sigla: 'MATS', nome: 'Mats', forma: 'rettangolo', w: 900, h: 100, dimensione: 0.7 },
+    MATS: { sigla: 'MATS', nome: 'Mats', forma: 'rettangolo', w: 900, h: 100, dimensione: 0.7, piuBrand: true },
     ADDITIONAL: { sigla: 'Additional', nome: 'Additional', forma: 'rettangolo', w: 248, h: 100, dimensione: 0.7 },
     RETROPORTA_GROUND: { sigla: 'Retroporta_ground', nome: 'Behind goal ground', forma: 'rettangolo', w: 700, h: 200, dimensione: 0.7 },
     RETROPORTA_VERTICAL: { sigla: 'Retroporta_vertical', nome: 'Behind goal vertical', forma: 'rettangolo', w: 480, h: 181, dimensione: 0.7 },
@@ -155,6 +156,7 @@
   /**
    * Disegna il mockup: immagine di base, poi la grafica della competizione nelle posizioni fisse
    * (opzioni.grafica, se c'è) e infine l'artwork del brand nelle posizioni scelte.
+   * artwork è un canvas per tutte le posizioni, oppure una funzione (posizione) → canvas quando i brand sono più di uno.
    * Se l'immagine ha lo spessore impostato, ogni tappeto disegnato riceve prima la sua sagoma grigia.
    */
   function mockup(immagine, scena, artwork, idPosizioni, opzioni) {
@@ -170,7 +172,13 @@
     };
     const grafica = opzioni && opzioni.grafica;
     if (grafica) for (const pos of scena.posizioni) if (pos.fissa) disegna(grafica, pos);
-    if (artwork) for (const pos of scena.posizioni) if (!pos.fissa && idPosizioni.includes(pos.id)) disegna(artwork, pos);
+    if (artwork) {
+      for (const pos of scena.posizioni) {
+        if (pos.fissa || !idPosizioni.includes(pos.id)) continue;
+        const art = typeof artwork === 'function' ? artwork(pos) : artwork;
+        if (art) disegna(art, pos);
+      }
+    }
     return c;
   }
 

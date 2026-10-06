@@ -46,6 +46,16 @@ Per ogni cliente compaiono le tipologie per cui il template ha almeno un'immagin
 
 In anteprima: *Detail* ingrandisce sulle posizioni, *Hold for original* (tenuto premuto) mostra la foto senza logo.
 
+### Due brand sui tappeti (*Two brands*)
+
+Nei tappeti (*Mats*) si possono mettere due loghi diversi nello stesso mockup, es. Adidas su un tappeto e Nike sull'altro:
+
+1. Al passo **Logo** scegli **Two brands**: compaiono le schede *Logo 1* e *Logo 2*. Carica un file in ognuna; la **Composition** (sfondo, colore, dimensione…) vale per il logo della scheda selezionata.
+2. Al passo **Positions**, per ogni tappeto scegli quale logo ci va, oppure *None*. All'inizio il primo tappeto ha il logo 1 e il secondo il logo 2.
+3. Al passo **Save** scrivi i nomi dei due brand. Si ottengono un PNG di produzione per brand (es. `Adidas_MATS.png` e `Nike_MATS.png`) e un solo JPG con entrambi (es. `Adidas_Nike_MATS_Domestic.jpg`). Togli la spunta a uno dei PNG per salvare solo l'altro.
+
+Con *One brand* tutto funziona come prima.
+
 ## Aggiungere o modificare un cliente (template)
 
 **Prima di iniziare:** servono le foto di base del cliente, 1920×1080, **pulite** (senza loghi nelle aree da usare): così le posizioni non selezionate e i loghi su sfondo trasparente mostrano la superficie vera. Le foto in PNG vengono salvate in automatico come JPG di alta qualità, per tenere leggeri i template. Lavora sulla copia della cartella del progetto sul tuo computer, con Chrome.

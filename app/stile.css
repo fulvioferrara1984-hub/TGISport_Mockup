@@ -227,10 +227,23 @@ input[type="range"] { width: 100%; accent-color: var(--accento); margin: 2px 0; 
 .posizione.attiva { border-color: var(--accento); background: var(--accento-tenue); }
 .posizione small { margin-left: auto; color: var(--inchiostro-3); font-size: 11.5px; }
 
+/* due brand: scelta, schede dei loghi e logo di ogni posizione */
+#blocco-brand { margin-bottom: 12px; }
+#sel-logo { margin-top: 8px; grid-auto-columns: minmax(0, 1fr); }
+#sel-logo button { min-width: 0; overflow: hidden; }
+#sel-logo button b, #sel-logo button small { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.passo h2 .del-logo { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--accento); }
+.posizione.assegna { cursor: default; padding: 7px 8px 7px 11px; }
+.posizione.assegna > span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.posizione.assegna .ruolo button { max-width: 92px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 .uscite { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 .uscite li { display: flex; align-items: baseline; gap: 8px; font-size: 12.5px; }
 .uscite code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; background: #f0f1f4; padding: 2px 6px; border-radius: 5px; word-break: break-all; }
 .uscite span { color: var(--inchiostro-3); white-space: nowrap; }
+.uscite label { display: flex; align-items: baseline; gap: 8px; min-width: 0; cursor: pointer; }
+.uscite input { flex: none; align-self: center; width: 15px; height: 15px; margin: 0; accent-color: var(--accento); }
+.uscite li.spento code { opacity: .5; text-decoration: line-through; }
 
 .cartella { font-size: 12.5px; color: var(--inchiostro-2); margin-bottom: 12px; line-height: 1.45; }
 .cartella b { color: var(--inchiostro); font-weight: 600; }
