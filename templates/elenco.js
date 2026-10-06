@@ -18,6 +18,7 @@ MockupTool.elencoTemplate([
   {"id":"t-f7fgxx5q4u","nome":{"iv":"7a9cbUj+R2BOYljM","ct":"AB2DxtxrW4KQ5vw0XEb55xNhrQ8="},"file":"t-f7fgxx5q4u.js"},
   {"id":"t-ksbdink43e","nome":{"iv":"GKGDfEQlX6XNsBEx","ct":"3V4lrHoMNSdnXZZ8xk4UlskqpA0Dcz2k"},"file":"t-ksbdink43e.js"},
   {"id":"t-kkvvyegrrg","nome":{"iv":"lqdzNIVJTlZ7pxOr","ct":"30Aj9AJZnpUadYp9toawadDQRdK30A=="},"file":"t-kkvvyegrrg.js"},
-  {"id":"t-2e4dhhnies","nome":{"iv":"4SM8LnxLDm++0Xs8","ct":"79HKt9tgmhqSYjrhx85trgqPbaJWIDk="},"file":"t-2e4dhhnies.js"}
+  {"id":"t-2e4dhhnies","nome":{"iv":"4SM8LnxLDm++0Xs8","ct":"79HKt9tgmhqSYjrhx85trgqPbaJWIDk="},"file":"t-2e4dhhnies.js"},
+  {"id":"t-ceguqzdmia","nome":{"iv":"9iN5sEoUVoASICIL","ct":"KqVfsZ1aDpYFEQJwSA6VNaHa1wF2TsE="},"file":"t-ceguqzdmia.js"}
 ],
 {"v":1,"iterazioni":600000,"sale":"9vDSY58/Igw8WnSah/IyJA==","controllo":{"iv":"/cGeTEN8EsJhCijT","ct":"aoO7QLCen/iyrcxvMxld7Vne/qrs2sODeg0seTA="}});
