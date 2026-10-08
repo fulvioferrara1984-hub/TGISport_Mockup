@@ -737,13 +737,13 @@
     if (!l.sorgente) { l.artwork = l.artworkHi = null; return; }
     if (l.composto) {
       const fonte = l.fonteComposto || l.sorgente.canvas;
-      l.artwork = C.adattaComposto(f, fonte, 1);
+      l.artwork = C.adattaComposto(f, fonte, 1, !bozza);
       const k = Math.max(1, Math.min(3, fonte.width / f.w));
-      l.artworkHi = k > 1.05 ? C.adattaComposto(f, fonte, k) : l.artwork;
+      l.artworkHi = k > 1.05 ? C.adattaComposto(f, fonte, k, !bozza) : l.artwork;
     } else {
       const logo = logoPerComposizione(l);
-      l.artwork = C.componi(f, logo, l.p, 1);
-      l.artworkHi = C.componi(f, logo, l.p, bozza ? 2 : 3);
+      l.artwork = C.componi(f, logo, l.p, 1, !bozza);
+      l.artworkHi = C.componi(f, logo, l.p, bozza ? 2 : 3, !bozza);
     }
   }
 

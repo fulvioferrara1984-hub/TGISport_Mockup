@@ -85,8 +85,73 @@
     }
   }
 
-  function canvasInBlob(canvas, tipo, qualita) {
+  function blobGrezzo(canvas, tipo, qualita) {
     return new Promise((ok, ko) => canvas.toBlob((b) => (b ? ok(b) : ko(new Error('Export failed'))), tipo, qualita));
+  }
+
+  // I PNG salvati portano il profilo colore sRGB (come i JPG): senza, alcuni programmi, per esempio Photoshop con
+  // un altro spazio di lavoro, li mostrano con colori diversi da quelli visti nella piattaforma.
+  async function canvasInBlob(canvas, tipo, qualita) {
+    const b = await blobGrezzo(canvas, tipo, qualita);
+    return tipo === 'image/png' ? pngConProfilo(b) : b;
+  }
+
+  // Profilo sRGB del browser, preso dal JPG che il browser stesso produce (segmento APP2 ICC_PROFILE).
+  let profiloSrgb = null;
+  function profiloDelBrowser() {
+    if (!profiloSrgb) {
+      profiloSrgb = (async () => {
+        const c = document.createElement('canvas');
+        c.width = c.height = 1;
+        c.getContext('2d', { colorSpace: 'srgb' }).fillRect(0, 0, 1, 1);   // senza contesto il browser non mette il profilo
+        const j = new Uint8Array(await (await blobGrezzo(c, 'image/jpeg', 0.9)).arrayBuffer());
+        for (let i = 2; i + 4 < j.length && j[i] === 0xff;) {
+          const marcatore = j[i + 1], n = (j[i + 2] << 8) | j[i + 3];
+          if (marcatore === 0xe2 && String.fromCharCode(...j.subarray(i + 4, i + 16)) === 'ICC_PROFILE\0' && j[i + 17] === 1) return j.slice(i + 18, i + 2 + n);
+          if (marcatore === 0xda) break;
+          i += 2 + n;
+        }
+        return null;
+      })().catch(() => null);
+    }
+    return profiloSrgb;
+  }
+
+  let tabellaCrc = null;
+  function crc32(dati) {
+    if (!tabellaCrc) {
+      tabellaCrc = new Uint32Array(256);
+      for (let n = 0; n < 256; n++) {
+        let c = n;
+        for (let k = 0; k < 8; k++) c = c & 1 ? 0xedb88320 ^ (c >>> 1) : c >>> 1;
+        tabellaCrc[n] = c >>> 0;
+      }
+    }
+    let c = 0xffffffff;
+    for (let i = 0; i < dati.length; i++) c = tabellaCrc[(c ^ dati[i]) & 0xff] ^ (c >>> 8);
+    return (c ^ 0xffffffff) >>> 0;
+  }
+
+  // Inserisce il chunk iCCP (profilo compresso) subito dopo IHDR; se qualcosa non va, il PNG resta com'era.
+  async function pngConProfilo(blob) {
+    try {
+      const icc = await profiloDelBrowser();
+      if (!icc || typeof CompressionStream !== 'function') return blob;
+      const png = new Uint8Array(await blob.arrayBuffer());
+      const testo = (da, a) => String.fromCharCode(...png.subarray(da, a));
+      if (testo(12, 16) !== 'IHDR') return blob;
+      const fineIhdr = 20 + new DataView(png.buffer).getUint32(8);
+      const compresso = new Uint8Array(await new Response(new Blob([icc]).stream().pipeThrough(new CompressionStream('deflate'))).arrayBuffer());
+      const chunk = new Uint8Array(12 + 6 + compresso.length);   // lunghezza, "iCCP", "sRGB\0", metodo 0, dati, CRC
+      const dv = new DataView(chunk.buffer);
+      dv.setUint32(0, 6 + compresso.length);
+      chunk.set([0x69, 0x43, 0x43, 0x50, 0x73, 0x52, 0x47, 0x42, 0, 0], 4);
+      chunk.set(compresso, 14);
+      dv.setUint32(chunk.length - 4, crc32(chunk.subarray(4, chunk.length - 4)));
+      return new Blob([png.subarray(0, fineIhdr), chunk, png.subarray(fineIhdr)], { type: 'image/png' });
+    } catch (e) {
+      return blob;
+    }
   }
 
   MK.archivio = { supportato, Cartella, scarica, scaricaTutti, canvasInBlob, leggi, scrivi };

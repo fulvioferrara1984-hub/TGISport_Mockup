@@ -28,8 +28,9 @@
    * Artwork composto: sfondo tinta unita (oppure trasparente se p.sfondo è null) + logo centrato (scalato e spostabile).
    * Per il cerchio il logo è inscritto in base alla sua forma reale, poi tutto viene ritagliato a disco.
    *  logo: { canvas, raggio }  ·  p: { sfondo, dimensione, offX, offY }  ·  scala: moltiplicatore di risoluzione
+   *  alta: ricampionamento di qualità (anteprima definitiva e file salvati), altrimenti quello veloce
    */
-  function componi(formato, logo, p, scala) {
+  function componi(formato, logo, p, scala, alta) {
     const W = Math.round(formato.w * scala), H = Math.round(formato.h * scala);
     const c = R.creaCanvas(W, H);
     const x = R.contesto(c);
@@ -43,7 +44,7 @@
       const s = s0 * p.dimensione;
       const dw = lw * s, dh = lh * s;
       const cx = W / 2 + p.offX * W, cy = H / 2 + p.offY * H;
-      R.disegnaHQ(x, logo.canvas, cx - dw / 2, cy - dh / 2, dw, dh);
+      R.disegnaHQ(x, logo.canvas, cx - dw / 2, cy - dh / 2, dw, dh, alta);
     }
     if (formato.forma === 'cerchio') mascheraCerchio(c);
     return c;
@@ -62,10 +63,10 @@
   }
 
   // Porta un file già composto alle misure di produzione (per il cerchio garantisce il disco pulito).
-  function adattaComposto(formato, canvas, scala) {
+  function adattaComposto(formato, canvas, scala, alta) {
     const W = Math.round(formato.w * scala), H = Math.round(formato.h * scala);
     const c = R.creaCanvas(W, H);
-    R.disegnaHQ(R.contesto(c), canvas, 0, 0, W, H);
+    R.disegnaHQ(R.contesto(c), canvas, 0, 0, W, H, alta);
     if (formato.forma === 'cerchio') mascheraCerchio(c);
     return c;
   }

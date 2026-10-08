@@ -33,9 +33,95 @@
     return out;
   }
 
-  // Disegna un'immagine in un rettangolo con ridimensionamento di qualità.
-  function disegnaHQ(ctx, img, dx, dy, dw, dh) {
+  function lanczos3(x) {
+    if (x === 0) return 1;
+    if (x <= -3 || x >= 3) return 0;
+    const px = Math.PI * x;
+    return (3 * Math.sin(px) * Math.sin(px / 3)) / (px * px);
+  }
+
+  // Pesi del ricampionamento lungo un asse (da → a pixel): per ogni pixel d'uscita, primo pixel sorgente e pesi.
+  function pesiAsse(da, a) {
+    const scala = da / a, passo = 1 / Math.max(1, scala), raggio = 3 * Math.max(1, scala);
+    const inizio = new Int32Array(a), pesi = [];
+    for (let i = 0; i < a; i++) {
+      const centro = (i + 0.5) * scala - 0.5;
+      const s = Math.max(0, Math.ceil(centro - raggio)), e = Math.min(da - 1, Math.floor(centro + raggio));
+      const w = new Float32Array(e - s + 1);
+      let tot = 0;
+      for (let j = s; j <= e; j++) tot += (w[j - s] = lanczos3((j - centro) * passo));
+      for (let k = 0; k < w.length; k++) w[k] /= tot;
+      inizio[i] = s;
+      pesi.push(w);
+    }
+    return { inizio, pesi };
+  }
+
+  // Ricampiona alla misura esatta w × h con il filtro di Lanczos (separabile, alfa premoltiplicata): nitido come
+  // un buon programma di grafica. Le riduzioni oltre 3× vengono prima dimezzate in fretta, senza perdere dettaglio.
+  function ricampiona(src, w, h) {
+    w = Math.max(1, Math.round(w));
+    h = Math.max(1, Math.round(h));
+    let cur = src, cw = src.width, ch = src.height;
+    while (cw > w * 3 || ch > h * 3) {
+      const nw = cw > w * 3 ? Math.ceil(cw / 2) : cw;
+      const nh = ch > h * 3 ? Math.ceil(ch / 2) : ch;
+      const c = creaCanvas(nw, nh);
+      contesto(c).drawImage(cur, 0, 0, nw, nh);
+      cur = c; cw = nw; ch = nh;
+    }
+    if (!(cur instanceof HTMLCanvasElement)) cur = copia(cur);
+    const S = contesto(cur).getImageData(0, 0, cw, ch).data;
+    const P = new Float32Array(cw * ch * 4);
+    for (let o = 0; o < S.length; o += 4) {
+      const a = S[o + 3] / 255;
+      P[o] = S[o] * a; P[o + 1] = S[o + 1] * a; P[o + 2] = S[o + 2] * a; P[o + 3] = S[o + 3];
+    }
+    // orizzontale: cw → w
+    const X = pesiAsse(cw, w), M = new Float32Array(w * ch * 4);
+    for (let y = 0; y < ch; y++) {
+      const riga = y * cw * 4;
+      for (let x = 0; x < w; x++) {
+        const q = X.pesi[x];
+        let r = 0, g = 0, b = 0, a = 0;
+        for (let k = 0, o = riga + X.inizio[x] * 4; k < q.length; k++, o += 4) {
+          const p = q[k];
+          r += P[o] * p; g += P[o + 1] * p; b += P[o + 2] * p; a += P[o + 3] * p;
+        }
+        const o = (y * w + x) * 4;
+        M[o] = r; M[o + 1] = g; M[o + 2] = b; M[o + 3] = a;
+      }
+    }
+    // verticale: ch → h, poi alfa di nuovo separata
+    const Y = pesiAsse(ch, h), c = creaCanvas(w, h), ctx = contesto(c), img = ctx.createImageData(w, h), D = img.data;
+    for (let y = 0; y < h; y++) {
+      const q = Y.pesi[y], s = Y.inizio[y];
+      for (let x = 0; x < w; x++) {
+        let r = 0, g = 0, b = 0, a = 0;
+        for (let k = 0, o = (s * w + x) * 4; k < q.length; k++, o += w * 4) {
+          const p = q[k];
+          r += M[o] * p; g += M[o + 1] * p; b += M[o + 2] * p; a += M[o + 3] * p;
+        }
+        if (a < 0.5) continue;
+        const o = (y * w + x) * 4, f = 255 / a;
+        D[o] = r * f; D[o + 1] = g * f; D[o + 2] = b * f; D[o + 3] = a;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return c;
+  }
+
+  // Disegna un'immagine in un rettangolo con ridimensionamento di qualità. Con `alta` (anteprima definitiva e file
+  // salvati) il rettangolo viene portato a pixel interi e l'immagine ricampionata in un solo passaggio: così non si
+  // aggiungono sfocature e i dettagli fini (testi piccoli, linee) restano netti e con il loro colore.
+  function disegnaHQ(ctx, img, dx, dy, dw, dh, alta) {
     if (dw <= 0 || dh <= 0) return;
+    if (alta) {
+      const x = Math.round(dx), y = Math.round(dy);
+      const w = Math.max(1, Math.round(dx + dw) - x), h = Math.max(1, Math.round(dy + dh) - y);
+      ctx.drawImage(ricampiona(img, w, h), x, y);
+      return;
+    }
     const ridotta = img.width > dw * 2 || img.height > dh * 2
       ? ridimensiona(img, Math.max(1, Math.ceil(dw)), Math.max(1, Math.ceil(dh)))
       : img;
@@ -149,5 +235,5 @@
     return c;
   }
 
-  MK.render = { creaCanvas, contesto, ridimensiona, disegnaHQ, deforma, copia };
+  MK.render = { creaCanvas, contesto, ridimensiona, ricampiona, disegnaHQ, deforma, copia };
 })(window.MK = window.MK || {});
