@@ -8,7 +8,7 @@ L'interfaccia è in inglese: in questa guida i nomi di sezioni e pulsanti sono s
 
 ## Come si apre
 
-- **Online**: apri il link del sito del team e inserisci la **password del team** (chiedila al referente del progetto). Con *Remember on this computer* la si scrive una volta sola; *Sign out* in alto a destra la dimentica.
+- **Online**: apri il link del sito del team e inserisci la **password del team** (chiedila al referente del progetto). Con *Remember on this computer* la si scrive una volta sola; *Sign out*, in fondo alla colonna a sinistra, la dimentica. Accanto c'è *Light mode* / *Dark mode* per passare dal tema scuro al chiaro: la scelta resta salvata nel browser.
 - **Dal computer**: doppio clic su **`Mockup Studio.html`** nella cartella del progetto (serve la stessa password).
 
 Consigliato **Google Chrome** (o Edge): permette di salvare direttamente in una cartella a scelta. Con Safari i file finiscono nella cartella Download.
